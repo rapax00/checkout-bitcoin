@@ -23,13 +23,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ errors: result.error.errors }, { status: 400 });
   }
 
-  const { fullname, email, qty } = result.data;
+  const {} = result.data;
 
   // Create order in prisma
 
   const response: TicketClaimResponse = {
     orderId: "432342423432423423423424234234",
-    qty,
+    qty: 12,
     total: 1000,
   };
 
