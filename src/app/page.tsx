@@ -14,6 +14,17 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { Navbar } from '@/components/navbar';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 import { cn } from '@/lib/utils';
 import { config } from '@/config/config';
@@ -25,6 +36,9 @@ import { FormPayment } from './component/form-payment';
 export default function Page() {
   const [countTickets, setCountTickets] = useState<number>(1);
   const [screen, setScreen] = useState<string>('information');
+
+  // Dialog for reset invoice
+  const [open, setOpen] = useState<boolean>(true);
 
   // Mock data
   const ticket = {
@@ -180,6 +194,21 @@ export default function Page() {
           </div>
         </section>
       </div>
+
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Oops! Try again</AlertDialogTitle>
+            <AlertDialogDescription>
+              It looks like you weren't able to complete the transaction in time.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction>Try again</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </LaWalletConfig>
   );
 }
