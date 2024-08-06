@@ -1,0 +1,113 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// sqlite postgresql
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Type {
+  USER
+  ORGANIZATION
+}
+
+enum Role {
+  ADMIN
+  CUSTOMER
+}
+
+enum Status {
+  ACTIVE
+}
+
+model Organization {
+  id         Int      @id @default(autoincrement())
+  type       Type
+  created_at DateTime
+  status     Status
+  User       User[]
+}
+
+model User {
+  id              Int      @id @default(autoincrement())
+  organization_id Int
+  image           String
+  name            String
+  email           String
+  created_at      DateTime
+  role            Role
+  status          Status
+
+  events       Event[]
+  ticketSolids TicketSolid[]
+  customers    Customer[]
+
+  organization Organization @relation(fields: [organization_id], references: [id])
+}
+
+model Event {
+  id          Int      @id @default(autoincrement())
+  user_id     Int
+  image       String
+  title       String
+  start_date  DateTime
+  end_date    DateTime
+  location    String
+  description String
+  created_at  DateTime
+  status      Status
+
+  user     User       @relation(fields: [user_id], references: [id])
+  tickets  Ticket[]
+  Customer Customer[]
+}
+
+model Ticket {
+  id             Int      @id @default(autoincrement())
+  event_id       Int
+  title          String
+  quantity       Int
+  limit_per_user Int
+  price_value    String
+  price_type     String
+  description    String
+  created_at     DateTime
+  status         Status
+
+  event Event @relation(fields: [event_id], references: [id])
+
+  ticketSolids TicketSolid[]
+}
+
+model TicketSolid {
+  id         Int      @id @default(autoincrement())
+  ticket_id  Int
+  user_id    Int
+  hash       String
+  created_at DateTime
+  status     Status
+
+  ticket   Ticket     @relation(fields: [ticket_id], references: [id])
+  user     User       @relation(fields: [user_id], references: [id])
+  Customer Customer[]
+}
+
+model Customer {
+  id              Int      @id @default(autoincrement())
+  event_id        Int
+  ticket_solid_id Int
+  user_id         Int
+  newsletter      Boolean  @default(false)
+  created_at      DateTime
+  status          Status
+
+  user        User        @relation(fields: [user_id], references: [id])
+  event       Event       @relation(fields: [event_id], references: [id])
+  ticketSolid TicketSolid @relation(fields: [ticket_solid_id], references: [id])
+}
