@@ -72,6 +72,10 @@ export default function Page() {
       }
 
       setScreen('payment');
+      window.scrollTo({
+        top: 0,
+        behavior: 'auto',
+      });
     });
   };
 
