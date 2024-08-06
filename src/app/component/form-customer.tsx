@@ -81,7 +81,7 @@ export function FormCustomer({ onSubmit }: any) {
       <div className='flex-1 flex flex-col gap-4'>
         <div className='flex flex-col gap-2'>
           <h2 className='font-bold text-2xl'>Information</h2>
-          <p className='text-gray-500'>Lorem ipsum dolor sit, amet consectetur</p>
+          <p className='text-text'>Lorem ipsum dolor sit, amet consectetur</p>
         </div>
         <Card className='p-6'>
           <div className='flex flex-col flex-1 justify-start'>
@@ -120,9 +120,7 @@ export function FormCustomer({ onSubmit }: any) {
                     >
                       Subscribe to the newsletter
                     </label>
-                    <p className='text-sm text-muted-foreground'>
-                      You agree to our Terms of Service and Privacy Policy.
-                    </p>
+                    <p className='text-sm text-text'>You agree to our Terms of Service and Privacy Policy.</p>
                   </div>
                 </div>
               </div>
