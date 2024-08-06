@@ -171,7 +171,7 @@ export default function Page() {
                       </Card>
                       <div className='p-4'>
                         <div className='flex gap-4 justify-between items-center'>
-                          <p className='text-text'>Total</p>
+                          <p className='text-text text-md'>Total</p>
                           <p className='font-bold text-md'>
                             {ticket.value * countTickets} {ticket.valueType}
                           </p>
@@ -210,53 +210,6 @@ export default function Page() {
               </>
             )}
           </div>
-          {/* <div className='w-full max-w-[520px] my-4 px-4'>
-            <Card className='p-4 bg-background'>
-              <div className='flex justify-between items-center gap-4'>
-                <div>
-                  <h2 className='text-md'>{ticket.title}</h2>
-                  <p className='font-semibold text-lg'>
-                    {ticket.value} {ticket.valueType}
-                  </p>
-                </div>
-                <div className='flex gap-2 items-center'>
-                  {screen === 'information' && (
-                    <Button
-                      variant={screen !== 'information' || countTickets === 1 ? 'ghost' : 'secondary'}
-                      size='icon'
-                      onClick={() => setCountTickets(countTickets - 1)}
-                      disabled={screen !== 'information' || countTickets === 1}
-                    >
-                      <MinusIcon />
-                    </Button>
-                  )}
-                  <p className='flex items-center justify-center gap-1 w-[40px] font-semibold'>
-                    {screen !== 'information' && <span className='font-normal text-xs text-text'>x</span>}
-                    {countTickets}
-                  </p>
-                  {screen === 'information' && (
-                    <Button
-                      variant={screen !== 'information' ? 'ghost' : 'secondary'}
-                      size='icon'
-                      onClick={() => setCountTickets(countTickets + 1)}
-                      disabled={screen !== 'information'}
-                    >
-                      <PlusIcon />
-                    </Button>
-                  )}
-                </div>
-              </div>
-              {screen === 'information' && <p className='mt-2 text-sm text-text'>{ticket.description}</p>}
-            </Card>
-            <div className='p-4'>
-              <div className='flex gap-4 justify-between items-center'>
-                <p className='text-text'>Total</p>
-                <p className='font-bold text-md'>
-                  {ticket.value * countTickets} {ticket.valueType}
-                </p>
-              </div>
-            </div>
-          </div> */}
         </aside>
 
         {/* Section data */}
@@ -322,7 +275,7 @@ export default function Page() {
             <SleepingIcon className='w-8 h-8 color-primary' />
             <AlertDialogTitle className='text-center'>Oops! Try again</AlertDialogTitle>
             <AlertDialogDescription className='text-center'>
-              It looks like you weren't able to complete the transaction in time.
+              {`It looks like you weren't able to complete the transaction in time.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
