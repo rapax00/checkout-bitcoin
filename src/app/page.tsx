@@ -14,6 +14,18 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { Navbar } from '@/components/navbar';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 import { cn } from '@/lib/utils';
 import { config } from '@/config/config';
@@ -25,6 +37,9 @@ import { FormPayment } from './component/form-payment';
 export default function Page() {
   const [countTickets, setCountTickets] = useState<number>(1);
   const [screen, setScreen] = useState<string>('information');
+
+  // Dialog for reset invoice
+  const [open, setOpen] = useState<boolean>(true);
 
   // Mock data
   const ticket = {
@@ -57,6 +72,10 @@ export default function Page() {
       }
 
       setScreen('payment');
+      window.scrollTo({
+        top: 0,
+        behavior: 'auto',
+      });
     });
   };
 
@@ -75,52 +94,121 @@ export default function Page() {
         {/* Aside info */}
         <aside className='bg-card relative flex justify-center items-center w-full min-h-full pt-[60px] md:pt-0'>
           <Navbar />
-          <div className='w-full max-w-[520px] my-4 px-4'>
-            <Card className='p-4 bg-background'>
-              <div className='flex justify-between items-center gap-4'>
-                <div>
-                  <h2 className='text-md'>{ticket.title}</h2>
-                  <p className='font-semibold text-lg'>
-                    {ticket.value} {ticket.valueType}
-                  </p>
+          <div className={cn('w-full max-w-[520px]  px-4', screen === 'information' ? 'my-4' : '')}>
+            {screen === 'information' ? (
+              <>
+                <Card className='p-4 bg-background'>
+                  <div className='flex justify-between items-center gap-4'>
+                    <div>
+                      <h2 className='text-md'>{ticket.title}</h2>
+                      <p className='font-semibold text-lg'>
+                        {ticket.value} {ticket.valueType}
+                      </p>
+                    </div>
+                    <div className='flex gap-2 items-center'>
+                      <Button
+                        variant={screen !== 'information' || countTickets === 1 ? 'ghost' : 'secondary'}
+                        size='icon'
+                        onClick={() => setCountTickets(countTickets - 1)}
+                        disabled={screen !== 'information' || countTickets === 1}
+                      >
+                        <MinusIcon />
+                      </Button>
+                      <p className='flex items-center justify-center gap-1 w-[40px] font-semibold'>
+                        {screen !== 'information' && <span className='font-normal text-xs text-text'>x</span>}
+                        {countTickets}
+                      </p>
+                      <Button
+                        variant={screen !== 'information' ? 'ghost' : 'secondary'}
+                        size='icon'
+                        onClick={() => setCountTickets(countTickets + 1)}
+                        disabled={screen !== 'information'}
+                      >
+                        <PlusIcon />
+                      </Button>
+                    </div>
+                  </div>
+                  <p className='mt-2 text-sm text-text'>{ticket.description}</p>
+                </Card>
+
+                <div className='p-4'>
+                  <div className='flex gap-4 justify-between items-center'>
+                    <p className='text-text'>Total</p>
+                    <p className='font-bold text-md'>
+                      {ticket.value * countTickets} {ticket.valueType}
+                    </p>
+                  </div>
                 </div>
-                <div className='flex gap-2 items-center'>
-                  {screen === 'information' && (
-                    <Button
-                      variant={screen !== 'information' || countTickets === 1 ? 'ghost' : 'secondary'}
-                      size='icon'
-                      onClick={() => setCountTickets(countTickets - 1)}
-                      disabled={screen !== 'information' || countTickets === 1}
-                    >
-                      <MinusIcon />
-                    </Button>
-                  )}
-                  <p className='flex items-center justify-center gap-1 w-[40px] font-semibold'>
-                    {screen !== 'information' && <span className='font-normal text-xs text-text'>x</span>}
-                    {countTickets}
-                  </p>
-                  {screen === 'information' && (
-                    <Button
-                      variant={screen !== 'information' ? 'ghost' : 'secondary'}
-                      size='icon'
-                      onClick={() => setCountTickets(countTickets + 1)}
-                      disabled={screen !== 'information'}
-                    >
-                      <PlusIcon />
-                    </Button>
-                  )}
+              </>
+            ) : (
+              <>
+                <Accordion type='single' collapsible className='w-full md:hidden'>
+                  <AccordionItem value='item-1'>
+                    <AccordionTrigger className='flex gap-2 no-underline'>
+                      <div className='flex items-center justify-between gap-2 w-full'>
+                        Show order summary
+                        <p className='font-bold text-lg no-underline'>
+                          {ticket.value * countTickets} {ticket.valueType}
+                        </p>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <Card className='p-4 bg-background'>
+                        <div className='flex justify-between items-center gap-4'>
+                          <div>
+                            <h2 className='text-md'>{ticket.title}</h2>
+                            <p className='font-semibold text-lg'>
+                              {ticket.value} {ticket.valueType}
+                            </p>
+                          </div>
+                          <div className='flex gap-2 items-center'>
+                            <p className='flex items-center justify-center gap-1 w-[40px] font-semibold'>
+                              {screen !== 'information' && <span className='font-normal text-text'>x</span>}
+                              {countTickets}
+                            </p>
+                          </div>
+                        </div>
+                      </Card>
+                      <div className='p-4'>
+                        <div className='flex gap-4 justify-between items-center'>
+                          <p className='text-text text-md'>Total</p>
+                          <p className='font-bold text-md'>
+                            {ticket.value * countTickets} {ticket.valueType}
+                          </p>
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+
+                <div className='hidden md:block '>
+                  <Card className='p-4 bg-background'>
+                    <div className='flex justify-between items-center gap-4'>
+                      <div>
+                        <h2 className='text-md'>{ticket.title}</h2>
+                        <p className='font-semibold text-lg'>
+                          {ticket.value} {ticket.valueType}
+                        </p>
+                      </div>
+                      <div className='flex gap-2 items-center'>
+                        <p className='flex items-center justify-center gap-1 w-[40px] font-semibold'>
+                          {screen !== 'information' && <span className='font-normal text-text'>x</span>}
+                          {countTickets}
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
+                  <div className='p-4'>
+                    <div className='flex gap-4 justify-between items-center'>
+                      <p className='text-text'>Total</p>
+                      <p className='font-bold text-md'>
+                        {ticket.value * countTickets} {ticket.valueType}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              {screen === 'information' && <p className='mt-2 text-sm text-text'>{ticket.description}</p>}
-            </Card>
-            <div className='p-4'>
-              <div className='flex gap-4 justify-between items-center'>
-                <p className='text-text'>Total</p>
-                <p className='font-bold text-md'>
-                  {ticket.value * countTickets} {ticket.valueType}
-                </p>
-              </div>
-            </div>
+              </>
+            )}
           </div>
         </aside>
 
@@ -180,6 +268,26 @@ export default function Page() {
           </div>
         </section>
       </div>
+
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader className='items-center'>
+            <SleepingIcon className='w-8 h-8 color-primary' />
+            <AlertDialogTitle className='text-center'>Oops! Try again</AlertDialogTitle>
+            <AlertDialogDescription className='text-center'>
+              {`It looks like you weren't able to complete the transaction in time.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className='flex-1 p-0'>
+              <Button className='w-full' variant='secondary' tabIndex={-1}>
+                Cancel
+              </Button>
+            </AlertDialogCancel>
+            <AlertDialogAction className='flex-1'>Try again</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </LaWalletConfig>
   );
 }
@@ -261,6 +369,51 @@ function PlusIcon(props: any) {
       fill='none'
     >
       <path d='M12 4V20M20 12H4' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round' />
+    </svg>
+  );
+}
+
+function SleepingIcon(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns='http://www.w3.org/2000/svg'
+      viewBox='0 0 24 24'
+      width='24'
+      height='24'
+      color='currentColor'
+      fill='none'
+    >
+      <path
+        d='M13 2.04938C12.6711 2.01672 12.3375 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 11.3151 21.9311 10.6462 21.8 10'
+        stroke='currentColor'
+        stroke-width='1.5'
+        stroke-linecap='round'
+        stroke-linejoin='round'
+      />
+      <path
+        d='M10 11H8.70711C8.25435 11 7.82014 10.8201 7.5 10.5M14 11H15.2929C15.7456 11 16.1799 10.8201 16.5 10.5'
+        stroke='currentColor'
+        stroke-width='1.5'
+        stroke-linecap='round'
+        stroke-linejoin='round'
+      />
+      <circle
+        cx='12'
+        cy='16'
+        r='2'
+        stroke='currentColor'
+        stroke-width='1.5'
+        stroke-linecap='round'
+        stroke-linejoin='round'
+      />
+      <path
+        d='M17 2H19.9474C20.5675 2 20.8775 2 20.9601 2.20009C21.0427 2.40019 20.8317 2.64023 20.4098 3.1203L17.9846 5.8797C17.5627 6.35977 17.3517 6.59981 17.4343 6.79991C17.5169 7 17.8269 7 18.447 7H21'
+        stroke='currentColor'
+        stroke-width='1.5'
+        stroke-linecap='round'
+        stroke-linejoin='round'
+      />
     </svg>
   );
 }
