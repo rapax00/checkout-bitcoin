@@ -1,45 +1,29 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef } from "react";
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Order, OrderUserData } from "../types/orders";
 
-import { supabase } from '@/config/db';
+interface FormCustomerProps {
+  onSubmit: (data: OrderUserData) => void;
+}
 
-const fetchData = async (email: string) => {
-  const { data, error } = await supabase.from('customer').select('*').eq('email', email);
-
-  if (error) {
-    console.error('Error fetching data:', error);
-    return null;
-  }
-
-  return data.length > 0 ? data[0] : null;
-};
-
-const insertData = async (value: any) => {
-  const { name, email, newsletter } = value;
-
-  const { error } = await supabase.from('customer').insert({ name, email, newsletter });
-
-  if (error) {
-    console.error('Error inserting data:', error);
-    return { error };
-  }
-
-  return {
-    status: 200,
-  };
-};
-
-export function FormCustomer({ onSubmit }: any) {
+export function FormCustomer({ onSubmit }: FormCustomerProps) {
   // Form
-  const [name, setName] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
+  const [fullname, setFullname] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
   const [newsletter, setNewsletter] = useState<boolean>(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -50,29 +34,20 @@ export function FormCustomer({ onSubmit }: any) {
     // onSubmit();
     // return null;
 
-    // Verify email
-    const existingCustomer = await fetchData(email);
+    // Insert data if not exist
+    const data = {
+      fullname,
+      email,
+      newsletter,
+    };
 
-    if (existingCustomer) {
-      setMessage('El correo electrónico ya está registrado.');
-      setLoading(false);
-      return;
+    const status = 200;
+
+    if (status && status === 200) {
+      onSubmit(data);
     } else {
-      // Insert data if not exist
-      const data = {
-        name,
-        email,
-        newsletter,
-      };
-
-      const { status } = await insertData(data);
-
-      if (status && status === 200) {
-        onSubmit();
-      } else {
-        setMessage('Hubo un error al registrar el cliente.');
-        setLoading(false);
-      }
+      setMessage("Hubo un error al registrar el cliente.");
+      setLoading(false);
     }
   };
 
@@ -91,12 +66,12 @@ export function FormCustomer({ onSubmit }: any) {
                   <Label htmlFor='name'>Name</Label>
                   <Input
                     type='text'
-                    id='name'
-                    name='name'
+                    id='fullname'
+                    name='fullname'
                     placeholder='Satoshi Nakamoto'
                     required
-                    onChange={(e) => setName(e.target.value)}
-                    defaultValue={name}
+                    onChange={(e) => setFullname(e.target.value)}
+                    defaultValue={fullname}
                   />
                 </div>
                 <div className='flex flex-col gap-2'>
@@ -112,7 +87,11 @@ export function FormCustomer({ onSubmit }: any) {
                   />
                 </div>
                 <div className='items-top flex space-x-2 mt-2'>
-                  <Checkbox id='newsletter' onCheckedChange={() => setNewsletter(!newsletter)} checked={newsletter} />
+                  <Checkbox
+                    id='newsletter'
+                    onCheckedChange={() => setNewsletter(!newsletter)}
+                    checked={newsletter}
+                  />
                   <div className='grid gap-1.5 leading-none'>
                     <label
                       htmlFor='newsletter'
@@ -120,12 +99,14 @@ export function FormCustomer({ onSubmit }: any) {
                     >
                       Subscribe to the newsletter
                     </label>
-                    <p className='text-sm text-text'>You agree to our Terms of Service and Privacy Policy.</p>
+                    <p className='text-sm text-text'>
+                      You agree to our Terms of Service and Privacy Policy.
+                    </p>
                   </div>
                 </div>
               </div>
               <Button type='submit' disabled={loading}>
-                {loading ? 'Generando ticket' : 'Confirm order'}
+                {loading ? "Generando ticket" : "Confirm order"}
               </Button>
             </form>
             {message && <p className='text-center text-sm mt-2'>{message}</p>}
