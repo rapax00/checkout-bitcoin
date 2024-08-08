@@ -107,13 +107,14 @@ export default function Page() {
       setIsloading(true);
       clear();
 
+      setScreen("payment");
+
       // Create new order
       try {
         const order = await requestNewOrder({ ...data, qty: countTickets });
         setInvoice(order.pr);
         setOrderReferenceId(order.orderReferenceId);
 
-        setScreen("payment");
         window.scrollTo({
           top: 0,
           behavior: "auto",
@@ -121,8 +122,8 @@ export default function Page() {
 
         // Emulate payment
         setTimeout(() => {
-          //emulateZapPayment();
-        }, 1000);
+          // emulateZapPayment();
+        }, 2000);
       } catch {
         alert("Error creating order");
       } finally {
