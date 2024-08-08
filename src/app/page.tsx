@@ -39,7 +39,7 @@ import { config } from "@/config/config";
 // Generic
 import { FormCustomer } from "./component/form-customer";
 import { FormPayment } from "./component/form-payment";
-import { Order, OrderRequest, OrderUserData } from "./types/orders";
+import { Order, OrderRequest, OrderUserData } from "../types/orders";
 
 // Icons
 import { SleepingIcon } from "@/components/icons/SleepingIcon";
@@ -47,7 +47,7 @@ import { CreditCardValidationIcon } from "@/components/icons/CreditCardValidatio
 import { PlusIcon } from "@/components/icons/PlusIcon";
 import { MinusIcon } from "@/components/icons/MinusIcon";
 
-import useOrder from "./hooks/useOrder";
+import useOrder from "../hooks/useOrder";
 
 // Mock data
 const TICKET = {
