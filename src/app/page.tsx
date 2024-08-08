@@ -139,7 +139,7 @@ export default function Page() {
   }, [isPaid]);
 
   return (
-    <LaWalletConfig config={config}>
+    <>
       <div className='flex flex-col md:flex-row w-full min-h-[100dvh]'>
         {/* Aside info */}
         <aside className='bg-card relative flex justify-center items-center w-full min-h-full pt-[60px] md:pt-0'>
@@ -383,6 +383,6 @@ export default function Page() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </LaWalletConfig>
+    </>
   );
 }
