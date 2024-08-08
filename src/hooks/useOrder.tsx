@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { Order, OrderRequest } from "../types/orders";
+import { Order, OrderRequest } from "@/types/orders";
 import { Event } from "nostr-tools";
 
 interface UseOrderReturn {

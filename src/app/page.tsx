@@ -37,9 +37,9 @@ import { cn } from "@/lib/utils";
 import { config } from "@/config/config";
 
 // Generic
-import { FormCustomer } from "./component/form-customer";
-import { FormPayment } from "./component/form-payment";
-import { Order, OrderRequest, OrderUserData } from "../types/orders";
+import { FormCustomer } from "../containers/form-customer";
+import { FormPayment } from "../containers/form-payment";
+import { Order, OrderRequest, OrderUserData } from "@/types/orders";
 
 // Icons
 import { SleepingIcon } from "@/components/icons/SleepingIcon";
@@ -47,7 +47,7 @@ import { CreditCardValidationIcon } from "@/components/icons/CreditCardValidatio
 import { PlusIcon } from "@/components/icons/PlusIcon";
 import { MinusIcon } from "@/components/icons/MinusIcon";
 
-import useOrder from "../hooks/useOrder";
+import useOrder from "@/hooks/useOrder";
 
 // Mock data
 const TICKET = {
@@ -129,7 +129,7 @@ export default function Page() {
         setIsloading(false);
       }
     },
-    [isLoading, countTickets, clear, requestNewOrder, emulateZapPayment]
+    [isLoading, countTickets, clear, requestNewOrder]
   );
 
   useEffect(() => {

@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Order, OrderUserData } from "../../types/orders";
+import { Order, OrderUserData } from "@/types/orders";
 
 interface FormCustomerProps {
   onSubmit: (data: OrderUserData) => void;
