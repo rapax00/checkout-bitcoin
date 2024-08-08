@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-
-const TICKET_PRICE = 1000;
+import signer from "@/app/services/signer";
+import { EventTemplate, NostrEvent, UnsignedEvent } from "nostr-tools";
+import { generateZapRequest } from "@/app/services/nostr";
+import { generateInvoice, getCallbackUrlFromWalias } from "@/app/services/ln";
+import { createOrder, CreateOrderResponse } from "@/app/lib/utils/prisma";
 
 const ticketSchema = z.object({
   fullname: z.string().min(3, { message: "Fullname is required" }),
@@ -11,7 +14,7 @@ const ticketSchema = z.object({
 
 interface RequestTicketResponse {
   pr: string;
-  orderId: string;
+  orderReferenceId: string;
   qty: number;
   total: number;
 }
@@ -31,17 +34,33 @@ export async function POST(req: NextRequest) {
   const { fullname, email, qty } = result.data;
 
   // Create order in prisma
+  const orderResponse: CreateOrderResponse = await createOrder(
+    fullname,
+    email,
+    qty
+  );
 
-  // Create zapRequest -> include orderId
+  // Zap Request
+  const unsignedZapRequest: EventTemplate = generateZapRequest(
+    orderResponse.referenceId,
+    orderResponse.totalSats
+  );
+  const zapRequest: EventTemplate = signer.signEvent(unsignedZapRequest);
 
-  // Calculate ticket price using yadio API
-  const orderTotal = qty * TICKET_PRICE;
+  const posWalias = process.env.POS_WALIAS!;
+  const callbackUrl = await getCallbackUrlFromWalias(posWalias);
+
+  const invoice = await generateInvoice(
+    callbackUrl,
+    orderResponse.totalSats,
+    zapRequest
+  );
 
   const response: RequestTicketResponse = {
-    pr: "lnbc1sd123213213123",
-    orderId: "432342423432423423423424234234",
+    pr: invoice,
+    orderReferenceId: orderResponse.referenceId,
     qty,
-    total: orderTotal,
+    total: orderResponse.totalSats,
   };
 
   return NextResponse.json({
