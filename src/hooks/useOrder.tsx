@@ -4,8 +4,15 @@ import { Event } from "nostr-tools";
 import { useLocalStorage } from "usehooks-ts";
 
 interface UseOrderReturn {
+  ticketsQty: number;
+  orderReferenceId: string | undefined;
+  paymentRequest: string | undefined;
+  isPaid: boolean;
+  setTicketsQty: (qty: number) => void;
+  setOrderReferenceId: (orderReferenceId: string | undefined) => void;
   requestNewOrder: (data: OrderRequest) => Promise<Order>;
   claimOrderPayment: (zapReceiptEvent: Event) => Promise<Order>;
+  setPaymentRequest: (paymentRequest: string | undefined) => void;
 }
 
 const useOrder = (): UseOrderReturn => {
@@ -16,7 +23,7 @@ const useOrder = (): UseOrderReturn => {
   const [paymentRequest, setPaymentRequest] = useLocalStorage<
     string | undefined
   >("pay_req", undefined);
-  const [paid, setIsPaid] = useLocalStorage<boolean>("is_paid", false);
+  const [isPaid, setIsPaid] = useLocalStorage<boolean>("is_paid", false);
 
   const [userData, setUserData, removeUserData] =
     useLocalStorage<OrderUserData>("userData", {
@@ -63,8 +70,15 @@ const useOrder = (): UseOrderReturn => {
   };
 
   return {
-    requestNewOrder,
+    ticketsQty,
+    orderReferenceId,
+    paymentRequest,
+    isPaid,
+    setTicketsQty,
+    setOrderReferenceId,
+    setPaymentRequest,
     claimOrderPayment,
+    requestNewOrder,
   };
 };
 

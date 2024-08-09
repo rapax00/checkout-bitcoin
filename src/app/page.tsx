@@ -78,17 +78,23 @@ export default function Page() {
   const [open, setOpen] = useState<boolean>(false);
 
   // Hooks
-  const { requestNewOrder, claimOrderPayment } = useOrder();
+  const {
+    orderReferenceId,
+    requestNewOrder,
+    claimOrderPayment,
+    setOrderReferenceId,
+    ticketsQty,
+    setTicketsQty,
+  } = useOrder();
 
   // Data
-  const [countTickets, setCountTickets] = useState<number>(1);
-  const [invoice, setInvoice] = useState<string>();
-  const [orderReferenceId, setOrderReferenceId] = useState<string>();
+  // const [ticketsQty, setTicketsQty] = useState<number>(1);
+  const [paymentRequest, setPaymentRequest] = useState<string>();
   const [isPaid, setIsPaid] = useState<boolean>(false);
 
   const clear = useCallback(() => {
     setOrderReferenceId(undefined);
-    setInvoice(undefined);
+    setPaymentRequest(undefined);
 
     setIsPaid(false);
   }, []);
@@ -111,8 +117,8 @@ export default function Page() {
 
       // Create new order
       try {
-        const order = await requestNewOrder({ ...data, qty: countTickets });
-        setInvoice(order.pr);
+        const order = await requestNewOrder({ ...data, qty: ticketsQty });
+        setPaymentRequest(order.pr);
         setOrderReferenceId(order.orderReferenceId);
 
         window.scrollTo({
@@ -130,7 +136,7 @@ export default function Page() {
         setIsloading(false);
       }
     },
-    [isLoading, countTickets, clear, requestNewOrder]
+    [isLoading, ticketsQty, clear, requestNewOrder]
   );
 
   useEffect(() => {
@@ -164,15 +170,13 @@ export default function Page() {
                     <div className='flex gap-2 items-center'>
                       <Button
                         variant={
-                          screen !== "information" || countTickets === 1
+                          screen !== "information" || ticketsQty === 1
                             ? "ghost"
                             : "secondary"
                         }
                         size='icon'
-                        onClick={() => setCountTickets(countTickets - 1)}
-                        disabled={
-                          screen !== "information" || countTickets === 1
-                        }
+                        onClick={() => setTicketsQty(ticketsQty - 1)}
+                        disabled={screen !== "information" || ticketsQty === 1}
                       >
                         <MinusIcon />
                       </Button>
@@ -182,14 +186,14 @@ export default function Page() {
                             x
                           </span>
                         )}
-                        {countTickets}
+                        {ticketsQty}
                       </p>
                       <Button
                         variant={
                           screen !== "information" ? "ghost" : "secondary"
                         }
                         size='icon'
-                        onClick={() => setCountTickets(countTickets + 1)}
+                        onClick={() => setTicketsQty(ticketsQty + 1)}
                         disabled={screen !== "information"}
                       >
                         <PlusIcon />
@@ -203,7 +207,7 @@ export default function Page() {
                   <div className='flex gap-4 justify-between items-center'>
                     <p className='text-text'>Total</p>
                     <p className='font-bold text-md'>
-                      {TICKET.value * countTickets} {TICKET.valueType}
+                      {TICKET.value * ticketsQty} {TICKET.valueType}
                     </p>
                   </div>
                 </div>
@@ -220,7 +224,7 @@ export default function Page() {
                       <div className='flex items-center justify-between gap-2 w-full'>
                         Show order summary
                         <p className='font-bold text-lg no-underline'>
-                          {TICKET.value * countTickets} {TICKET.valueType}
+                          {TICKET.value * ticketsQty} {TICKET.valueType}
                         </p>
                       </div>
                     </AccordionTrigger>
@@ -238,7 +242,7 @@ export default function Page() {
                               {screen !== "information" && (
                                 <span className='font-normal text-text'>x</span>
                               )}
-                              {countTickets}
+                              {ticketsQty}
                             </p>
                           </div>
                         </div>
@@ -247,7 +251,7 @@ export default function Page() {
                         <div className='flex gap-4 justify-between items-center'>
                           <p className='text-text text-md'>Total</p>
                           <p className='font-bold text-md'>
-                            {TICKET.value * countTickets} {TICKET.valueType}
+                            {TICKET.value * ticketsQty} {TICKET.valueType}
                           </p>
                         </div>
                       </div>
@@ -269,7 +273,7 @@ export default function Page() {
                           {screen !== "information" && (
                             <span className='font-normal text-text'>x</span>
                           )}
-                          {countTickets}
+                          {ticketsQty}
                         </p>
                       </div>
                     </div>
@@ -278,7 +282,7 @@ export default function Page() {
                     <div className='flex gap-4 justify-between items-center'>
                       <p className='text-text'>Total</p>
                       <p className='font-bold text-md'>
-                        {TICKET.value * countTickets} {TICKET.valueType}
+                        {TICKET.value * ticketsQty} {TICKET.valueType}
                       </p>
                     </div>
                   </div>
@@ -336,7 +340,7 @@ export default function Page() {
               <FormCustomer onSubmit={handleCreateOrder} />
             )}
 
-            {screen === "payment" && <FormPayment invoice={invoice} />}
+            {screen === "payment" && <FormPayment invoice={paymentRequest} />}
 
             {screen === "summary" && (
               <>
