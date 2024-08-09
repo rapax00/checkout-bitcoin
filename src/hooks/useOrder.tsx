@@ -13,6 +13,8 @@ interface UseOrderReturn {
   requestNewOrder: (data: OrderRequest) => Promise<Order>;
   claimOrderPayment: (zapReceiptEvent: Event) => Promise<Order>;
   setPaymentRequest: (paymentRequest: string | undefined) => void;
+  setIsPaid: (isPaid: boolean) => void;
+  clear: () => void;
 }
 
 const useOrder = (): UseOrderReturn => {
@@ -50,8 +52,15 @@ const useOrder = (): UseOrderReturn => {
         }, 1000);
       });
     },
-    []
+    [setIsPaid, setOrderReferenceId, setPaymentRequest]
   );
+
+  const clear = useCallback(() => {
+    setOrderReferenceId(undefined);
+    setPaymentRequest(undefined);
+
+    setIsPaid(false);
+  }, [setIsPaid, setOrderReferenceId, setPaymentRequest]);
 
   const claimOrderPayment = async (zapReceiptEvent: Event): Promise<Order> => {
     // Emulate request
@@ -79,6 +88,8 @@ const useOrder = (): UseOrderReturn => {
     setPaymentRequest,
     claimOrderPayment,
     requestNewOrder,
+    setIsPaid,
+    clear,
   };
 };
 

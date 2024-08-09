@@ -72,7 +72,7 @@ const ZAP_RECEIPT_EVENT: Event = {
 export default function Page() {
   // Flow
   const [screen, setScreen] = useState<string>("information");
-  const [isLoading, setIsloading] = useState<boolean>(false);
+  const [isLoading, setIsloading] = useState<boolean>(true);
 
   // Dialog for reset invoice
   const [open, setOpen] = useState<boolean>(false);
@@ -80,31 +80,24 @@ export default function Page() {
   // Hooks
   const {
     orderReferenceId,
+    ticketsQty,
+    paymentRequest,
+    isPaid,
     requestNewOrder,
     claimOrderPayment,
     setOrderReferenceId,
-    ticketsQty,
     setTicketsQty,
+    setPaymentRequest,
+    setIsPaid,
+    clear,
   } = useOrder();
-
-  // Data
-  // const [ticketsQty, setTicketsQty] = useState<number>(1);
-  const [paymentRequest, setPaymentRequest] = useState<string>();
-  const [isPaid, setIsPaid] = useState<boolean>(false);
-
-  const clear = useCallback(() => {
-    setOrderReferenceId(undefined);
-    setPaymentRequest(undefined);
-
-    setIsPaid(false);
-  }, []);
 
   const emulateZapPayment = useCallback(async () => {
     const order = await claimOrderPayment(ZAP_RECEIPT_EVENT);
     console.info("order:");
     console.dir(order);
     setIsPaid(true);
-  }, [claimOrderPayment]);
+  }, [claimOrderPayment, setIsPaid]);
 
   const handleCreateOrder = useCallback(
     async (data: OrderUserData) => {
@@ -136,7 +129,14 @@ export default function Page() {
         setIsloading(false);
       }
     },
-    [isLoading, ticketsQty, clear, requestNewOrder]
+    [
+      isLoading,
+      ticketsQty,
+      clear,
+      requestNewOrder,
+      setPaymentRequest,
+      setOrderReferenceId,
+    ]
   );
 
   useEffect(() => {
@@ -144,6 +144,14 @@ export default function Page() {
       setScreen("summary");
     }
   }, [isPaid]);
+
+  useEffect(() => {
+    setIsloading(false);
+  }, []);
+
+  if (isLoading) {
+    return <></>;
+  }
 
   return (
     <>
