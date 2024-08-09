@@ -8,15 +8,15 @@ async function getBtcPrice(): Promise<number> {
   });
 }
 
-async function convertArsToSats(priceArs: number): Promise<number> {
-  return Math.round((priceArs / (await getBtcPrice())) * 100000000);
+async function convertArsToMiliSats(priceArs: number): Promise<number> {
+  return Math.round((priceArs / (await getBtcPrice())) * 100000000000);
 }
 
 async function calculateTicketPrice(
   qty: number,
   ticketPriceArs: number
 ): Promise<number> {
-  const ticketPriceSats: number = await convertArsToSats(ticketPriceArs);
+  const ticketPriceSats: number = await convertArsToMiliSats(ticketPriceArs);
 
   const totalTicketPriceSats: number = qty * ticketPriceSats;
 
