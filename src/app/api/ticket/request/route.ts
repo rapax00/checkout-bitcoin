@@ -1,22 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
-import signer from "@/app/services/signer";
-import { EventTemplate, NostrEvent, UnsignedEvent } from "nostr-tools";
-import { generateZapRequest } from "@/app/services/nostr";
-import { generateInvoice, getCallbackUrlFromWalias } from "@/app/services/ln";
+import { Event } from "nostr-tools";
+import { generateZapRequest } from "@/app/lib/utils/nostr";
+import { generateInvoice, getLnurlpFromWalias } from "@/app/services/ln";
 import { createOrder, CreateOrderResponse } from "@/app/lib/utils/prisma";
-
-const ticketSchema = z.object({
-  fullname: z.string().min(3, { message: "Fullname is required" }),
-  email: z.string().email({ message: "Invalid email address" }),
-  qty: z.number().int().lt(1000).positive({ message: "Qty Must be a number" }),
-});
+import { ticketSchema } from "@/app/lib/validation/ticketSchema";
 
 interface RequestTicketResponse {
   pr: string;
   orderReferenceId: string;
   qty: number;
-  total: number;
+  totalMiliSats: number;
 }
 
 export async function POST(req: NextRequest) {
@@ -25,6 +18,8 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
+
+  // Zod
   const result = ticketSchema.safeParse(body);
 
   if (!result.success) {
@@ -33,38 +28,41 @@ export async function POST(req: NextRequest) {
 
   const { fullname, email, qty } = result.data;
 
-  // Create order in prisma
+  // Prisma Create order and user (if not created before) in prisma
   const orderResponse: CreateOrderResponse = await createOrder(
     fullname,
     email,
     qty
   );
 
-  // Zap Request
-  const unsignedZapRequest: EventTemplate = generateZapRequest(
-    orderResponse.referenceId,
-    orderResponse.totalSats
-  );
-  const zapRequest: EventTemplate = signer.signEvent(unsignedZapRequest);
-
+  // Lnurlp
   const posWalias = process.env.POS_WALIAS!;
-  const callbackUrl = await getCallbackUrlFromWalias(posWalias);
+  const lnurlp = await getLnurlpFromWalias(posWalias);
 
+  // Zap Request
+  const zapRequest: Event = generateZapRequest(
+    orderResponse.referenceId,
+    orderResponse.totalMiliSats,
+    lnurlp.nostrPubkey
+  );
+
+  // Invoice
   const invoice = await generateInvoice(
-    callbackUrl,
-    orderResponse.totalSats,
+    lnurlp.callback,
+    orderResponse.totalMiliSats,
     zapRequest
   );
 
+  // Response
   const response: RequestTicketResponse = {
     pr: invoice,
     orderReferenceId: orderResponse.referenceId,
     qty,
-    total: orderResponse.totalSats,
+    totalMiliSats: orderResponse.totalMiliSats,
   };
 
   return NextResponse.json({
-    message: "User registered successfully",
+    message: "User and order created successfully",
     data: response,
   });
 }
