@@ -1,6 +1,7 @@
 import { useCallback } from "react";
-import { Order, OrderRequest } from "@/types/orders";
+import { Order, OrderRequest, OrderUserData } from "@/types/orders";
 import { Event } from "nostr-tools";
+import { useLocalStorage } from "usehooks-ts";
 
 interface UseOrderReturn {
   requestNewOrder: (data: OrderRequest) => Promise<Order>;
@@ -8,6 +9,22 @@ interface UseOrderReturn {
 }
 
 const useOrder = (): UseOrderReturn => {
+  const [ticketsQty, setTicketsQty] = useLocalStorage("tickets_qty", 1);
+  const [orderReferenceId, setOrderReferenceId] = useLocalStorage<
+    string | undefined
+  >("orderReference", undefined);
+  const [paymentRequest, setPaymentRequest] = useLocalStorage<
+    string | undefined
+  >("pay_req", undefined);
+  const [paid, setIsPaid] = useLocalStorage<boolean>("is_paid", false);
+
+  const [userData, setUserData, removeUserData] =
+    useLocalStorage<OrderUserData>("userData", {
+      fullname: "",
+      email: "",
+      newsletter: false,
+    });
+
   const requestNewOrder = useCallback(
     async (data: OrderRequest): Promise<Order> => {
       // Emulate request
@@ -17,8 +34,12 @@ const useOrder = (): UseOrderReturn => {
             ...data,
             total: 100,
             orderReferenceId: "123456",
-            pr: "asdad",
+            pr: "invoice",
           });
+
+          setOrderReferenceId("123456");
+          setPaymentRequest("invoice");
+          setIsPaid(false);
         }, 1000);
       });
     },
