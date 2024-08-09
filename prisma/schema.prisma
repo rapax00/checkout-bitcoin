@@ -18,12 +18,13 @@ model User {
 }
 
 model Order {
-    id          String  @id @default(uuid())
-    referenceId String  @unique
-    qty         Int
-    totalSats   Int
-    paid        Boolean @default(false)
-    userId      String
+    id            String  @id @default(uuid())
+    referenceId   String  @unique
+    qty           Int
+    totalMiliSats Int
+    paid          Boolean @default(false)
+    zapReceiptId  String? @unique
+    userId        String
 
     User User? @relation(fields: [userId], references: [id])
 }
