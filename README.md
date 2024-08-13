@@ -1,36 +1,116 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Simple Ticket Checkout
 
-## Getting Started
+This is a simple ticket checkout system to pay with SATS.
 
-First, run the development server:
+It use Lightning Network to pay tickets, NOSTR to comunication, Sendy to mailing service and SQLite to database.
+
+# Getting Started
+
+1. Copy the `.env.example` file to `.env` and fill in the required values.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnmp install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+3. Use the correct node version
 
-## Learn More
+```bash
+nvm use
+```
 
-To learn more about Next.js, take a look at the following resources:
+4. Create database
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+pnpm prisma migrate dev --init
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+5. Start the server
 
-## Deploy on Vercel
+```bash
+pnpm dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Endpoints
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Create a new ticket
+
+`your_ticketing_domain/api/ticket/request`
+
+- Create user in the database (If the email is not already in the database)
+- Create a new ticket in the database
+- Add email to Sendy list (Subscribed or not to newsletter)
+
+## Parameters:
+
+```json
+{
+    "fullname": <string>,
+    "email": <string>,
+    "qty": <number>,
+    "isSubscribed": <boolean>
+}
+```
+
+## Response:
+
+### Valid
+
+```json
+{
+	"message": "User and order created successfully",
+	"data": {
+		"pr": <string, invoice to pay>,
+		"orderReferenceId": <64-character lowercase hex value, tag e of zap request>,
+		"qty": <number, quantity of orders>,
+		"totalMiliSats": <number, total to pay in mili sats>
+	}
+}
+```
+
+### Invalid
+
+```json
+{
+  "errors": <array of json objects, each one object describe one error>
+}
+```
+
+## Claim ticket
+
+`your_ticketing_domain/api/ticket/claim`
+
+- Check if the invoice is paid
+- Update database to mark the ticket as paid
+
+## Parameters:
+
+```json
+{
+    "fullname": <string>,
+    "email": <string>,
+    "zapReceipt": <json object zap receipt nostr event>,
+}
+```
+
+## Response:
+
+### Valid
+
+```json
+{
+	"message": "User registered successfully",
+	"data": {
+		"fullname": <string>,
+		"email": <string>,
+		"orderReferenceId": <64-character lowercase hex value>,
+		"qty": <number>,
+		"totalMiliSats": <number>
+	}
+}
+```
