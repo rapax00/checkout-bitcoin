@@ -4,6 +4,7 @@ import { generateZapRequest } from "@/app/lib/utils/nostr";
 import { generateInvoice, getLnurlpFromWalias } from "@/app/services/ln";
 import { createOrder, CreateOrderResponse } from "@/app/lib/utils/prisma";
 import { ticketSchema } from "@/app/lib/validation/ticketSchema";
+import { sendy } from "@/app/services/sendy";
 
 interface RequestTicketResponse {
   pr: string;
@@ -26,7 +27,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ errors: result.error.errors }, { status: 400 });
   }
 
-  const { fullname, email, qty } = result.data;
+  const { fullname, email, qty, isSubscribed } = result.data;
 
   // Prisma Create order and user (if not created before) in prisma
   const orderResponse: CreateOrderResponse = await createOrder(
@@ -34,6 +35,40 @@ export async function POST(req: NextRequest) {
     email,
     qty
   );
+
+  // Sendy
+  // Always add to list
+  const sendyResponse = await sendy.subscribe({
+    name: fullname,
+    email,
+    listId: process.env.SENDY_LIST_ID!,
+  });
+
+  if (!sendyResponse.success) {
+    return NextResponse.json(
+      {
+        errors: `Add to sendy list failed. ${sendyResponse.message}`,
+      },
+      { status: 404 }
+    );
+  }
+
+  // Unsuscribe from list
+  if (!isSubscribed) {
+    const sendyUnsubscribeResponse = await sendy.unsubscribe({
+      email,
+      listId: process.env.SENDY_LIST_ID!,
+    });
+
+    if (!sendyUnsubscribeResponse.success) {
+      return NextResponse.json(
+        {
+          errors: `Unsubscription to sendy list failed. ${sendyResponse.message}`,
+        },
+        { status: 404 }
+      );
+    }
+  }
 
   // Lnurlp
   const posWalias = process.env.POS_WALIAS!;
