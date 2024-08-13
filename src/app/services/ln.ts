@@ -13,8 +13,6 @@ async function generateInvoice(
     url += `&nostr=${encodedZapEvent}&lnurl=lnurl`;
   }
 
-  console.log("url", url, "\n"); // debug
-
   return ((await (await fetch(url)).json()) as any).pr as string;
 }
 
