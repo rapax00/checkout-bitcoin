@@ -1,7 +1,5 @@
 import { updateOrder, updateOrderResponse } from "./../../../lib/utils/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import { Order, User } from "@prisma/client";
-import { prisma } from "@/app/services/prismaClient";
 import { getPublicKey, validateEvent } from "nostr-tools";
 import {
   claimSchema,
@@ -38,12 +36,15 @@ export async function POST(req: NextRequest) {
   const isValidEmitter = validateZapReceiptEmitter(zapReceipt);
 
   if (!isValidEvent) {
-    return NextResponse.json({ errors: "Invalid zapReceipt" }, { status: 403 });
+    return NextResponse.json(
+      { errors: "Invalid zap receipt" },
+      { status: 403 }
+    );
   }
 
   if (!isValidEmitter) {
     return NextResponse.json(
-      { errors: "Invalid zapReceipt emitter" },
+      { errors: "Invalid zap receipt emitter" },
       { status: 403 }
     );
   }
