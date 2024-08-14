@@ -63,7 +63,7 @@ pnpm dev
 
 ```json
 {
-	"message": "User and order created successfully",
+	"status": <boolean>,
 	"data": {
 		"pr": <string, invoice to pay>,
 		"orderReferenceId": <64-character lowercase hex value, tag e of zap request>,
@@ -77,7 +77,8 @@ pnpm dev
 
 ```json
 {
-  "errors": <array of json objects, each one object describe one error>
+	"status": <boolean>,
+	"errors": <array of json objects, each one object describe one error>
 }
 ```
 
@@ -104,7 +105,7 @@ pnpm dev
 
 ```json
 {
-	"message": "User registered successfully",
+	"status": <boolean>,
 	"data": {
 		"fullname": <string>,
 		"email": <string>,
