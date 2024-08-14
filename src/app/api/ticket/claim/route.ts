@@ -1,11 +1,11 @@
-import { updateOrder, updateOrderResponse } from "./../../../lib/utils/prisma";
-import { NextRequest, NextResponse } from "next/server";
-import { getPublicKey, validateEvent } from "nostr-tools";
+import { updateOrder, updateOrderResponse } from './../../../lib/utils/prisma';
+import { NextRequest, NextResponse } from 'next/server';
+import { getPublicKey, validateEvent } from 'nostr-tools';
 import {
   claimSchema,
   validateZapReceiptEmitter,
   validateZapRequest,
-} from "@/app/lib/validation/claimSchema";
+} from '@/app/lib/validation/claimSchema';
 
 interface TicketClaimResponse {
   fullname: string;
@@ -16,8 +16,11 @@ interface TicketClaimResponse {
 }
 
 export async function POST(req: NextRequest) {
-  if (req.method !== "POST") {
-    return NextResponse.json({ errors: "Method not allowed" }, { status: 405 });
+  if (req.method !== 'POST') {
+    return NextResponse.json(
+      { status: false, errors: 'Method not allowed' },
+      { status: 405 }
+    );
   }
 
   const body = await req.json();
@@ -26,7 +29,10 @@ export async function POST(req: NextRequest) {
   const result = claimSchema.safeParse(body);
 
   if (!result.success) {
-    return NextResponse.json({ errors: result.error.errors }, { status: 400 });
+    return NextResponse.json(
+      { status: false, errors: result.error.errors },
+      { status: 400 }
+    );
   }
 
   const { fullname, email, zapReceipt } = result.data;
@@ -37,26 +43,29 @@ export async function POST(req: NextRequest) {
 
   if (!isValidEvent) {
     return NextResponse.json(
-      { errors: "Invalid zap receipt" },
+      { status: false, errors: 'Invalid zap receipt' },
       { status: 403 }
     );
   }
 
   if (!isValidEmitter) {
     return NextResponse.json(
-      { errors: "Invalid zap receipt emitter" },
+      { status: false, errors: 'Invalid zap receipt emitter' },
       { status: 403 }
     );
   }
 
   // Validate zapRequest
   const publicKey = getPublicKey(
-    Uint8Array.from(Buffer.from(process.env.SIGNER_PRIVATE_KEY!, "hex"))
+    Uint8Array.from(Buffer.from(process.env.SIGNER_PRIVATE_KEY!, 'hex'))
   );
   const isValidZapRequest = validateZapRequest(zapReceipt, publicKey);
 
   if (!isValidZapRequest) {
-    return NextResponse.json({ errors: "Invalid zapRequest" }, { status: 403 });
+    return NextResponse.json(
+      { status: false, errors: 'Invalid zapRequest' },
+      { status: 403 }
+    );
   }
 
   // Prisma
@@ -76,7 +85,7 @@ export async function POST(req: NextRequest) {
   };
 
   return NextResponse.json({
-    message: "User registered successfully",
+    status: true,
     data: response,
   });
 }

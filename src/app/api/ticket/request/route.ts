@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
-import { Event } from "nostr-tools";
-import { generateZapRequest } from "@/app/lib/utils/nostr";
-import { generateInvoice, getLnurlpFromWalias } from "@/app/services/ln";
-import { createOrder, CreateOrderResponse } from "@/app/lib/utils/prisma";
-import { ticketSchema } from "@/app/lib/validation/ticketSchema";
-import { sendy } from "@/app/services/sendy";
+import { NextRequest, NextResponse } from 'next/server';
+import { Event } from 'nostr-tools';
+import { generateZapRequest } from '@/app/lib/utils/nostr';
+import { generateInvoice, getLnurlpFromWalias } from '@/app/services/ln';
+import { createOrder, CreateOrderResponse } from '@/app/lib/utils/prisma';
+import { ticketSchema } from '@/app/lib/validation/ticketSchema';
+import { sendy } from '@/app/services/sendy';
 
 interface RequestTicketResponse {
   pr: string;
@@ -14,8 +14,11 @@ interface RequestTicketResponse {
 }
 
 export async function POST(req: NextRequest) {
-  if (req.method !== "POST") {
-    return NextResponse.json({ errors: "Method not allowed" }, { status: 405 });
+  if (req.method !== 'POST') {
+    return NextResponse.json(
+      { status: false, errors: 'Method not allowed' },
+      { status: 405 }
+    );
   }
 
   const body = await req.json();
@@ -24,10 +27,13 @@ export async function POST(req: NextRequest) {
   const result = ticketSchema.safeParse(body);
 
   if (!result.success) {
-    return NextResponse.json({ errors: result.error.errors }, { status: 400 });
+    return NextResponse.json(
+      { status: false, errors: result.error.errors },
+      { status: 400 }
+    );
   }
 
-  const { fullname, email, qty, isSubscribed } = result.data;
+  const { fullname, email, qty, newsletter } = result.data;
 
   // Prisma Create order and user (if not created before) in prisma
   const orderResponse: CreateOrderResponse = await createOrder(
@@ -47,6 +53,7 @@ export async function POST(req: NextRequest) {
   if (!sendyResponse.success) {
     return NextResponse.json(
       {
+        status: false,
         errors: `Add to sendy list failed. ${sendyResponse.message}`,
       },
       { status: 404 }
@@ -54,7 +61,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Unsuscribe from list
-  if (!isSubscribed) {
+  if (!newsletter) {
     const sendyUnsubscribeResponse = await sendy.unsubscribe({
       email,
       listId: process.env.SENDY_LIST_ID!,
@@ -63,6 +70,7 @@ export async function POST(req: NextRequest) {
     if (!sendyUnsubscribeResponse.success) {
       return NextResponse.json(
         {
+          status: false,
           errors: `Unsubscription to sendy list failed. ${sendyResponse.message}`,
         },
         { status: 404 }
@@ -97,7 +105,7 @@ export async function POST(req: NextRequest) {
   };
 
   return NextResponse.json({
-    message: "User and order created successfully",
+    status: true,
     data: response,
   });
 }
