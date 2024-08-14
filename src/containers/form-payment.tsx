@@ -1,14 +1,25 @@
-'use client';
+"use client";
 
-import { QRCodeSVG } from 'qrcode.react';
+import { QRCodeSVG } from "qrcode.react";
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 
-export function FormPayment({ invoice }: any) {
+interface FormPaymentProps {
+  invoice?: string;
+}
+
+export function FormPayment({ invoice }: FormPaymentProps) {
   return (
     <>
       <div className='flex-1 flex flex-col gap-4'>
@@ -39,7 +50,7 @@ export function FormPayment({ invoice }: any) {
                       size={300}
                       imageSettings={{
                         // Iso 24x24, image 42x42
-                        src: '/iso.png',
+                        src: "/iso.png",
                         x: undefined,
                         y: undefined,
                         height: 42,
@@ -53,7 +64,11 @@ export function FormPayment({ invoice }: any) {
                 </div>
               </Card>
               <div className='flex gap-2 w-full mt-2'>
-                <Button variant='secondary' className='w-full' onClick={() => null}>
+                <Button
+                  variant='secondary'
+                  className='w-full'
+                  onClick={() => null}
+                >
                   Pay with wallet
                 </Button>
                 <Button className='w-full' onClick={() => null}>
@@ -65,7 +80,9 @@ export function FormPayment({ invoice }: any) {
               <Card>
                 <CardHeader>
                   <CardTitle>Bitcoin Onchain</CardTitle>
-                  <CardDescription>Lorem ipsum dolor sit, amet consectetur</CardDescription>
+                  <CardDescription>
+                    Lorem ipsum dolor sit, amet consectetur
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className='max-w-[300px] mx-auto'>
