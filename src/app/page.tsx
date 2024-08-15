@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
-import { LaWalletConfig, useZap } from "@lawallet/react";
-import { Event } from "nostr-tools";
+import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
+import { useNostr, useSubscription, useZap } from '@lawallet/react';
+import { Event } from 'nostr-tools';
 
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Navbar } from "@/components/navbar";
+} from '@/components/ui/breadcrumb';
+import { Navbar } from '@/components/navbar';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,53 +25,57 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+} from '@/components/ui/alert-dialog';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
+} from '@/components/ui/accordion';
 
-import { cn } from "@/lib/utils";
-import { config } from "@/config/config";
+import { cn } from '@/lib/utils';
 
 // Generic
-import { FormCustomer } from "../containers/form-customer";
-import { FormPayment } from "../containers/form-payment";
-import { Order, OrderRequest, OrderUserData } from "@/types/orders";
+import { FormCustomer } from '../containers/form-customer';
+import { FormPayment } from '../containers/form-payment';
+import { Order, OrderRequest, OrderUserData } from '@/types/orders';
 
 // Icons
-import { SleepingIcon } from "@/components/icons/SleepingIcon";
-import { CreditCardValidationIcon } from "@/components/icons/CreditCardValidationIcon";
-import { PlusIcon } from "@/components/icons/PlusIcon";
-import { MinusIcon } from "@/components/icons/MinusIcon";
+import { SleepingIcon } from '@/components/icons/SleepingIcon';
+import { CreditCardValidationIcon } from '@/components/icons/CreditCardValidationIcon';
+import { PlusIcon } from '@/components/icons/PlusIcon';
+import { MinusIcon } from '@/components/icons/MinusIcon';
 
-import useOrder from "@/hooks/useOrder";
+import useOrder from '@/hooks/useOrder';
 
 // Mock data
 const TICKET = {
-  title: "Ticket #1",
+  title: 'Ticket #1',
   description:
-    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Reprehenderit impedit aperiam, optio dolores tenetur earum.",
-  imageUrl: "https://placehold.co/400",
+    'Lorem ipsum dolor sit amet consectetur adipisicing elit. Reprehenderit impedit aperiam, optio dolores tenetur earum.',
+  imageUrl: 'https://placehold.co/400',
   value: 1,
-  valueType: "SAT",
+  valueType: 'SAT',
 };
 
 const ZAP_RECEIPT_EVENT: Event = {
-  content: "",
+  content: '',
   created_at: 123123,
-  id: "",
+  id: '',
   kind: 9735,
-  pubkey: "",
-  sig: "",
+  pubkey: '',
+  sig: '',
   tags: [],
+};
+
+const ORDER_DATA: OrderUserData = {
+  fullname: 'Testito',
+  email: 'testito@lacrypta.ar',
 };
 
 export default function Page() {
   // Flow
-  const [screen, setScreen] = useState<string>("information");
+  const [screen, setScreen] = useState<string>('information');
   const [isLoading, setIsloading] = useState<boolean>(true);
 
   // Dialog for reset invoice
@@ -92,12 +96,41 @@ export default function Page() {
     clear,
   } = useOrder();
 
-  const emulateZapPayment = useCallback(async () => {
-    const order = await claimOrderPayment(ZAP_RECEIPT_EVENT);
-    console.info("order:");
-    console.dir(order);
-    setIsPaid(true);
-  }, [claimOrderPayment, setIsPaid]);
+  const { events } = useSubscription({
+    filters: [{ kinds: [9735], '#e': [orderReferenceId!] }],
+    options: { closeOnEose: true },
+    enabled: Boolean(orderReferenceId),
+  });
+
+  console.log('events:', orderReferenceId);
+  console.log('events:', events);
+
+  const emulateZapPayment = useCallback(
+    async (data: OrderUserData) => {
+      console.log('event:', events[0]);
+      if (events && events.length > 0) {
+        let event: Event = {
+          tags: events[0].tags as string[][],
+          content: events[0].content as string,
+          created_at: events[0].created_at as number,
+          pubkey: events[0].pubkey as string,
+          id: events[0].id as string,
+          kind: events[0].kind as number,
+          sig: events[0].sig as string,
+        };
+
+        const order = await claimOrderPayment(data, event);
+
+        console.info('order:');
+        console.dir(order);
+
+        setIsPaid(true);
+      } else {
+        console.warn('No event received to process payment');
+      }
+    },
+    [events, claimOrderPayment, setIsPaid]
+  );
 
   const handleCreateOrder = useCallback(
     async (data: OrderUserData) => {
@@ -106,7 +139,7 @@ export default function Page() {
       setIsloading(true);
       clear();
 
-      setScreen("payment");
+      setScreen('payment');
 
       // Create new order
       try {
@@ -116,15 +149,16 @@ export default function Page() {
 
         window.scrollTo({
           top: 0,
-          behavior: "auto",
+          behavior: 'auto',
         });
 
         // Emulate payment
         setTimeout(() => {
-          // emulateZapPayment();
-        }, 2000);
+          console.log('emulateZapPayment');
+          emulateZapPayment(data);
+        }, 15000);
       } catch {
-        alert("Error creating order");
+        alert('Error creating order');
       } finally {
         setIsloading(false);
       }
@@ -136,12 +170,13 @@ export default function Page() {
       requestNewOrder,
       setPaymentRequest,
       setOrderReferenceId,
+      emulateZapPayment,
     ]
   );
 
   useEffect(() => {
     if (isPaid) {
-      setScreen("summary");
+      setScreen('summary');
     }
   }, [isPaid]);
 
@@ -155,42 +190,42 @@ export default function Page() {
 
   return (
     <>
-      <div className='flex flex-col md:flex-row w-full min-h-[100dvh]'>
+      <div className="flex flex-col md:flex-row w-full min-h-[100dvh]">
         {/* Aside info */}
-        <aside className='bg-card relative flex justify-center items-center w-full min-h-full pt-[60px] md:pt-0'>
+        <aside className="bg-card relative flex justify-center items-center w-full min-h-full pt-[60px] md:pt-0">
           <Navbar />
           <div
             className={cn(
-              "w-full max-w-[520px]  px-4",
-              screen === "information" ? "my-4" : ""
+              'w-full max-w-[520px]  px-4',
+              screen === 'information' ? 'my-4' : ''
             )}
           >
-            {screen === "information" ? (
+            {screen === 'information' ? (
               <>
-                <Card className='p-4 bg-background'>
-                  <div className='flex justify-between items-center gap-4'>
+                <Card className="p-4 bg-background">
+                  <div className="flex justify-between items-center gap-4">
                     <div>
-                      <h2 className='text-md'>{TICKET.title}</h2>
-                      <p className='font-semibold text-lg'>
+                      <h2 className="text-md">{TICKET.title}</h2>
+                      <p className="font-semibold text-lg">
                         {TICKET.value} {TICKET.valueType}
                       </p>
                     </div>
-                    <div className='flex gap-2 items-center'>
+                    <div className="flex gap-2 items-center">
                       <Button
                         variant={
-                          screen !== "information" || ticketsQty === 1
-                            ? "ghost"
-                            : "secondary"
+                          screen !== 'information' || ticketsQty === 1
+                            ? 'ghost'
+                            : 'secondary'
                         }
-                        size='icon'
+                        size="icon"
                         onClick={() => setTicketsQty(ticketsQty - 1)}
-                        disabled={screen !== "information" || ticketsQty === 1}
+                        disabled={screen !== 'information' || ticketsQty === 1}
                       >
                         <MinusIcon />
                       </Button>
-                      <p className='flex items-center justify-center gap-1 w-[40px] font-semibold'>
-                        {screen !== "information" && (
-                          <span className='font-normal text-xs text-text'>
+                      <p className="flex items-center justify-center gap-1 w-[40px] font-semibold">
+                        {screen !== 'information' && (
+                          <span className="font-normal text-xs text-text">
                             x
                           </span>
                         )}
@@ -198,23 +233,23 @@ export default function Page() {
                       </p>
                       <Button
                         variant={
-                          screen !== "information" ? "ghost" : "secondary"
+                          screen !== 'information' ? 'ghost' : 'secondary'
                         }
-                        size='icon'
+                        size="icon"
                         onClick={() => setTicketsQty(ticketsQty + 1)}
-                        disabled={screen !== "information"}
+                        disabled={screen !== 'information'}
                       >
                         <PlusIcon />
                       </Button>
                     </div>
                   </div>
-                  <p className='mt-2 text-sm text-text'>{TICKET.description}</p>
+                  <p className="mt-2 text-sm text-text">{TICKET.description}</p>
                 </Card>
 
-                <div className='p-4'>
-                  <div className='flex gap-4 justify-between items-center'>
-                    <p className='text-text'>Total</p>
-                    <p className='font-bold text-md'>
+                <div className="p-4">
+                  <div className="flex gap-4 justify-between items-center">
+                    <p className="text-text">Total</p>
+                    <p className="font-bold text-md">
                       {TICKET.value * ticketsQty} {TICKET.valueType}
                     </p>
                   </div>
@@ -223,42 +258,42 @@ export default function Page() {
             ) : (
               <>
                 <Accordion
-                  type='single'
+                  type="single"
                   collapsible
-                  className='w-full md:hidden'
+                  className="w-full md:hidden"
                 >
-                  <AccordionItem value='item-1'>
-                    <AccordionTrigger className='flex gap-2 no-underline'>
-                      <div className='flex items-center justify-between gap-2 w-full'>
+                  <AccordionItem value="item-1">
+                    <AccordionTrigger className="flex gap-2 no-underline">
+                      <div className="flex items-center justify-between gap-2 w-full">
                         Show order summary
-                        <p className='font-bold text-lg no-underline'>
+                        <p className="font-bold text-lg no-underline">
                           {TICKET.value * ticketsQty} {TICKET.valueType}
                         </p>
                       </div>
                     </AccordionTrigger>
                     <AccordionContent>
-                      <Card className='p-4 bg-background'>
-                        <div className='flex justify-between items-center gap-4'>
+                      <Card className="p-4 bg-background">
+                        <div className="flex justify-between items-center gap-4">
                           <div>
-                            <h2 className='text-md'>{TICKET.title}</h2>
-                            <p className='font-semibold text-lg'>
+                            <h2 className="text-md">{TICKET.title}</h2>
+                            <p className="font-semibold text-lg">
                               {TICKET.value} {TICKET.valueType}
                             </p>
                           </div>
-                          <div className='flex gap-2 items-center'>
-                            <p className='flex items-center justify-center gap-1 w-[40px] font-semibold'>
-                              {screen !== "information" && (
-                                <span className='font-normal text-text'>x</span>
+                          <div className="flex gap-2 items-center">
+                            <p className="flex items-center justify-center gap-1 w-[40px] font-semibold">
+                              {screen !== 'information' && (
+                                <span className="font-normal text-text">x</span>
                               )}
                               {ticketsQty}
                             </p>
                           </div>
                         </div>
                       </Card>
-                      <div className='p-4'>
-                        <div className='flex gap-4 justify-between items-center'>
-                          <p className='text-text text-md'>Total</p>
-                          <p className='font-bold text-md'>
+                      <div className="p-4">
+                        <div className="flex gap-4 justify-between items-center">
+                          <p className="text-text text-md">Total</p>
+                          <p className="font-bold text-md">
                             {TICKET.value * ticketsQty} {TICKET.valueType}
                           </p>
                         </div>
@@ -267,29 +302,29 @@ export default function Page() {
                   </AccordionItem>
                 </Accordion>
 
-                <div className='hidden md:block '>
-                  <Card className='p-4 bg-background'>
-                    <div className='flex justify-between items-center gap-4'>
+                <div className="hidden md:block ">
+                  <Card className="p-4 bg-background">
+                    <div className="flex justify-between items-center gap-4">
                       <div>
-                        <h2 className='text-md'>{TICKET.title}</h2>
-                        <p className='font-semibold text-lg'>
+                        <h2 className="text-md">{TICKET.title}</h2>
+                        <p className="font-semibold text-lg">
                           {TICKET.value} {TICKET.valueType}
                         </p>
                       </div>
-                      <div className='flex gap-2 items-center'>
-                        <p className='flex items-center justify-center gap-1 w-[40px] font-semibold'>
-                          {screen !== "information" && (
-                            <span className='font-normal text-text'>x</span>
+                      <div className="flex gap-2 items-center">
+                        <p className="flex items-center justify-center gap-1 w-[40px] font-semibold">
+                          {screen !== 'information' && (
+                            <span className="font-normal text-text">x</span>
                           )}
                           {ticketsQty}
                         </p>
                       </div>
                     </div>
                   </Card>
-                  <div className='p-4'>
-                    <div className='flex gap-4 justify-between items-center'>
-                      <p className='text-text'>Total</p>
-                      <p className='font-bold text-md'>
+                  <div className="p-4">
+                    <div className="flex gap-4 justify-between items-center">
+                      <p className="text-text">Total</p>
+                      <p className="font-bold text-md">
                         {TICKET.value * ticketsQty} {TICKET.valueType}
                       </p>
                     </div>
@@ -301,17 +336,17 @@ export default function Page() {
         </aside>
 
         {/* Section data */}
-        <section className='relative flex flex-1 md:flex-auto w-full justify-center md:pr-4'>
-          <div className='flex flex-col gap-4 px-4 w-full py-4 max-w-[520px] pt-[80px]'>
-            <div className='absolute top-0 left-0 w-full h-[60px] flex justify-center items-center mx-auto  px-4 border-b-[1px] border-border'>
-              <div className='w-full max-w-[520px]'>
+        <section className="relative flex flex-1 md:flex-auto w-full justify-center md:pr-4">
+          <div className="flex flex-col gap-4 px-4 w-full py-4 max-w-[520px] pt-[80px]">
+            <div className="absolute top-0 left-0 w-full h-[60px] flex justify-center items-center mx-auto  px-4 border-b-[1px] border-border">
+              <div className="w-full max-w-[520px]">
                 <Breadcrumb>
                   <BreadcrumbList>
                     <BreadcrumbItem>
                       <BreadcrumbPage
                         className={cn(
-                          "",
-                          screen === "information" ? "text-white" : "text-text"
+                          '',
+                          screen === 'information' ? 'text-white' : 'text-text'
                         )}
                       >
                         Information
@@ -321,8 +356,8 @@ export default function Page() {
                     <BreadcrumbItem>
                       <BreadcrumbPage
                         className={cn(
-                          "",
-                          screen === "payment" ? "text-white" : "text-text"
+                          '',
+                          screen === 'payment' ? 'text-white' : 'text-text'
                         )}
                       >
                         Payment
@@ -332,8 +367,8 @@ export default function Page() {
                     <BreadcrumbItem>
                       <BreadcrumbPage
                         className={cn(
-                          "",
-                          screen === "summary" ? "text-white" : "text-text"
+                          '',
+                          screen === 'summary' ? 'text-white' : 'text-text'
                         )}
                       >
                         Summary
@@ -344,28 +379,28 @@ export default function Page() {
               </div>
             </div>
 
-            {screen === "information" && (
+            {screen === 'information' && (
               <FormCustomer onSubmit={handleCreateOrder} />
             )}
 
-            {screen === "payment" && <FormPayment invoice={paymentRequest} />}
+            {screen === 'payment' && <FormPayment invoice={paymentRequest} />}
 
-            {screen === "summary" && (
+            {screen === 'summary' && (
               <>
                 <Card>
-                  <div className='flex-1 flex flex-col items-center justify-center gap-4 w-full mx-auto py-12 px-8'>
-                    <CreditCardValidationIcon className='w-8 h-8' />
-                    <div className='flex flex-col gap-2 text-center'>
-                      <h2 className='font-bold text-2xl'>Congratulation!</h2>
-                      <p className='text-text'>
+                  <div className="flex-1 flex flex-col items-center justify-center gap-4 w-full mx-auto py-12 px-8">
+                    <CreditCardValidationIcon className="w-8 h-8" />
+                    <div className="flex flex-col gap-2 text-center">
+                      <h2 className="font-bold text-2xl">Congratulation!</h2>
+                      <p className="text-text">
                         Your payment has been confirmed. We have sent the event
                         details to your email.
                       </p>
                     </div>
                   </div>
                 </Card>
-                <Link href='/'>
-                  <Button className='w-full' variant='link'>
+                <Link href="/">
+                  <Button className="w-full" variant="link">
                     Back to page
                   </Button>
                 </Link>
@@ -377,22 +412,22 @@ export default function Page() {
 
       <AlertDialog open={open} onOpenChange={setOpen}>
         <AlertDialogContent>
-          <AlertDialogHeader className='items-center'>
-            <SleepingIcon className='w-8 h-8 color-primary' />
-            <AlertDialogTitle className='text-center'>
+          <AlertDialogHeader className="items-center">
+            <SleepingIcon className="w-8 h-8 color-primary" />
+            <AlertDialogTitle className="text-center">
               Oops! Try again
             </AlertDialogTitle>
-            <AlertDialogDescription className='text-center'>
+            <AlertDialogDescription className="text-center">
               {`It looks like you weren't able to complete the transaction in time.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className='flex-1 p-0'>
-              <Button className='w-full' variant='secondary' tabIndex={-1}>
+            <AlertDialogCancel className="flex-1 p-0">
+              <Button className="w-full" variant="secondary" tabIndex={-1}>
                 Cancel
               </Button>
             </AlertDialogCancel>
-            <AlertDialogAction className='flex-1'>Try again</AlertDialogAction>
+            <AlertDialogAction className="flex-1">Try again</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
