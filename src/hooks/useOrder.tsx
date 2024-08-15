@@ -1,7 +1,7 @@
-import { useCallback } from "react";
-import { Order, OrderRequest, OrderUserData } from "@/types/orders";
-import { Event } from "nostr-tools";
-import { useLocalStorage } from "usehooks-ts";
+import { useCallback } from 'react';
+import { Order, OrderRequest, OrderUserData } from '@/types/orders';
+import { Event } from 'nostr-tools';
+import { useLocalStorage } from 'usehooks-ts';
 
 interface UseOrderReturn {
   ticketsQty: number;
@@ -11,46 +11,71 @@ interface UseOrderReturn {
   setTicketsQty: (qty: number) => void;
   setOrderReferenceId: (orderReferenceId: string | undefined) => void;
   requestNewOrder: (data: OrderRequest) => Promise<Order>;
-  claimOrderPayment: (zapReceiptEvent: Event) => Promise<Order>;
+  claimOrderPayment: (
+    data: OrderUserData,
+    zapReceiptEvent: Event
+  ) => Promise<Order>;
   setPaymentRequest: (paymentRequest: string | undefined) => void;
   setIsPaid: (isPaid: boolean) => void;
   clear: () => void;
 }
 
 const useOrder = (): UseOrderReturn => {
-  const [ticketsQty, setTicketsQty] = useLocalStorage("tickets_qty", 1);
+  const [ticketsQty, setTicketsQty] = useLocalStorage('tickets_qty', 1);
   const [orderReferenceId, setOrderReferenceId] = useLocalStorage<
     string | undefined
-  >("orderReference", undefined);
+  >('orderReference', undefined);
   const [paymentRequest, setPaymentRequest] = useLocalStorage<
     string | undefined
-  >("pay_req", undefined);
-  const [isPaid, setIsPaid] = useLocalStorage<boolean>("is_paid", false);
+  >('pay_req', undefined);
+  const [isPaid, setIsPaid] = useLocalStorage<boolean>('is_paid', false);
 
   const [userData, setUserData, removeUserData] =
-    useLocalStorage<OrderUserData>("userData", {
-      fullname: "",
-      email: "",
+    useLocalStorage<OrderUserData>('userData', {
+      fullname: '',
+      email: '',
       newsletter: false,
     });
 
   const requestNewOrder = useCallback(
     async (data: OrderRequest): Promise<Order> => {
-      // Emulate request
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            ...data,
-            total: 100,
-            orderReferenceId: "123456",
-            pr: "invoice",
-          });
+      console.log('Requesting new order:', data);
+      try {
+        const response = await fetch('/api/ticket/request', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        });
 
-          setOrderReferenceId("123456");
-          setPaymentRequest("invoice");
-          setIsPaid(false);
-        }, 1000);
-      });
+        if (!response.ok) {
+          throw new Error('Failed to create order');
+        }
+
+        const result: { status: string; data: Order } = await response.json();
+        setOrderReferenceId(result.data.orderReferenceId);
+        setPaymentRequest(result.data.pr);
+        setIsPaid(false);
+
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve({
+              ...data,
+              totalMiliSats: result.data.totalMiliSats,
+              orderReferenceId: result.data.orderReferenceId,
+              pr: result.data.pr,
+            });
+
+            setOrderReferenceId(result.data.orderReferenceId);
+            setPaymentRequest(result.data.pr);
+            setIsPaid(false);
+          }, 1000);
+        });
+      } catch (error) {
+        console.error('Error creating order:', error);
+        throw error;
+      }
     },
     [setIsPaid, setOrderReferenceId, setPaymentRequest]
   );
@@ -62,20 +87,52 @@ const useOrder = (): UseOrderReturn => {
     setIsPaid(false);
   }, [setIsPaid, setOrderReferenceId, setPaymentRequest]);
 
-  const claimOrderPayment = async (zapReceiptEvent: Event): Promise<Order> => {
-    // Emulate request
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          email: "",
-          fullname: "",
-          qty: 2,
-          total: 100,
-          orderReferenceId: "123456",
-          pr: "asdad",
-        });
-      }, 1000);
-    });
+  const claimOrderPayment = async (
+    data: OrderUserData,
+    zapReceiptEvent: Event
+  ): Promise<Order> => {
+    try {
+      const body: any = {
+        fullname: data.fullname,
+        email: data.email,
+        zapReceipt: zapReceiptEvent,
+      };
+
+      const response = await fetch(`/api/ticket/claim`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) {
+        const body = await response.json();
+
+        console.log('ERROR: ', body.errors);
+
+        throw new Error('Failed to claim order payment');
+      }
+
+      const result: { status: string; data: Order } = await response.json(); // pr is not returned in the response
+      setIsPaid(true);
+
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve({
+            fullname: result.data.fullname,
+            email: result.data.email,
+            orderReferenceId: result.data.orderReferenceId,
+            qty: result.data.qty,
+            totalMiliSats: result.data.totalMiliSats,
+            pr: '',
+          });
+        }, 1000);
+      });
+    } catch (error) {
+      console.error('Error claiming order payment:', error);
+      throw error;
+    }
   };
 
   return {
