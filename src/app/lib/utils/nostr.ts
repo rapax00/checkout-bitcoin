@@ -1,4 +1,4 @@
-import { Event, EventTemplate, finalizeEvent, getPublicKey } from "nostr-tools";
+import { Event, EventTemplate, finishEvent, getPublicKey } from 'nostr-tools';
 
 function generateZapRequest(
   orderId: string,
@@ -8,19 +8,18 @@ function generateZapRequest(
   const unsignedZapRequest: EventTemplate = {
     kind: 9734,
     tags: [
-      ["p", nostrPubkey],
-      ["amount", amountSats.toString()],
-      ["relays", "wss://relay.lawallet.ar", "wss://nostr-pub.wellorder.net"],
-      ["e", orderId],
+      ['p', nostrPubkey],
+      ['amount', amountSats.toString()],
+      ['relays', 'wss://relay.lawallet.ar', 'wss://nostr-pub.wellorder.net'],
+      ['e', orderId],
     ] as string[][],
-    content: "",
+    content: '',
     created_at: Math.round(Date.now() / 1000),
   };
 
-  const privateKey = Uint8Array.from(
-    Buffer.from(process.env.SIGNER_PRIVATE_KEY!, "hex")
-  );
-  const zapRequest: Event = finalizeEvent(unsignedZapRequest, privateKey);
+  const privateKey = process.env.SIGNER_PRIVATE_KEY!;
+
+  const zapRequest: Event = finishEvent(unsignedZapRequest, privateKey);
 
   return zapRequest;
 }
