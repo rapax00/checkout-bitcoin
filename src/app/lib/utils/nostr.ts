@@ -24,4 +24,16 @@ function generateZapRequest(
   return zapRequest;
 }
 
-export { generateZapRequest };
+function convertEvent(event: any): Event {
+  return {
+    tags: event.tags as string[][],
+    content: event.content as string,
+    created_at: event.created_at as number,
+    pubkey: event.pubkey as string,
+    id: event.id as string,
+    kind: event.kind as number,
+    sig: event.sig as string,
+  };
+}
+
+export { generateZapRequest, convertEvent };
