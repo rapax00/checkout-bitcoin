@@ -58,21 +58,6 @@ const TICKET = {
   valueType: 'SAT',
 };
 
-const ZAP_RECEIPT_EVENT: Event = {
-  content: '',
-  created_at: 123123,
-  id: '',
-  kind: 9735,
-  pubkey: '',
-  sig: '',
-  tags: [],
-};
-
-const ORDER_DATA: OrderUserData = {
-  fullname: 'Testito',
-  email: 'testito@lacrypta.ar',
-};
-
 export default function Page() {
   // Flow
   const [screen, setScreen] = useState<string>('information');
@@ -102,35 +87,38 @@ export default function Page() {
     clear,
   } = useOrder();
 
-  const { events, loading } = useSubscription({
+  const { events, restartSubscription } = useSubscription({
     filters: [{ kinds: [9735], '#e': [orderReferenceId!] }],
     options: { closeOnEose: false },
     enabled: Boolean(orderReferenceId),
   });
 
-  const emulateZapPayment = useCallback(
-    async (data: OrderUserData) => {
-      console.log('emulateZapPayment');
+  const zapPayment = useCallback(async () => {
+    console.log('zapPayment');
 
-      if (newEvent === undefined) {
-        console.warn('No event received to process payment');
-        return;
-      }
+    if (!newEvent || !userData) {
+      console.warn(
+        newEvent
+          ? ''
+          : 'Event not defined ' + userData
+          ? ''
+          : 'Data not defined'
+      );
+      return;
+    }
 
-      const order = await claimOrderPayment(data, newEvent);
+    const order = await claimOrderPayment(userData, newEvent);
 
-      console.info('order:');
-      console.dir(order);
-
-      setNewEvent(undefined);
-      setIsPaid(true);
-    },
-    [newEvent, setNewEvent, claimOrderPayment, setIsPaid]
-  );
+    setUserData(undefined);
+    setNewEvent(undefined);
+    setIsPaid(true);
+  }, [newEvent, userData, setNewEvent, claimOrderPayment, setIsPaid]);
 
   useEffect(() => {
+    console.log('use effect');
+
     if (events && events.length > 0 && userData) {
-      let event: Event = {
+      const event: Event = {
         tags: events[0].tags as string[][],
         content: events[0].content as string,
         created_at: events[0].created_at as number,
@@ -140,13 +128,15 @@ export default function Page() {
         sig: events[0].sig as string,
       };
 
-      console.log('Event received:', event);
+      restartSubscription();
+
       setNewEvent(event);
-      emulateZapPayment(userData);
+
+      zapPayment();
     } else {
       console.warn('No event received to process payment');
     }
-  }, [events, emulateZapPayment, userData]);
+  }, [userData, events, zapPayment, restartSubscription]);
 
   const handleCreateOrder = useCallback(
     async (data: OrderUserData) => {
@@ -169,10 +159,6 @@ export default function Page() {
         });
 
         setUserData(data);
-        // // Emulate payment
-        // setTimeout(() => {
-        //   emulateZapPayment(data);
-        // }, 2000);
       } catch {
         alert('Error creating order');
       } finally {
@@ -186,7 +172,7 @@ export default function Page() {
       requestNewOrder,
       setPaymentRequest,
       setOrderReferenceId,
-      // emulateZapPayment,
+      // zapPayment,
     ]
   );
 
