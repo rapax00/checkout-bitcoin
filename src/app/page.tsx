@@ -47,6 +47,7 @@ import { PlusIcon } from '@/components/icons/PlusIcon';
 import { MinusIcon } from '@/components/icons/MinusIcon';
 
 import useOrder from '@/hooks/useOrder';
+import { convertEvent } from './lib/utils/nostr';
 
 // Mock data
 const TICKET = {
@@ -87,56 +88,52 @@ export default function Page() {
     clear,
   } = useOrder();
 
-  const { events, restartSubscription } = useSubscription({
+  const { events, subscription } = useSubscription({
     filters: [{ kinds: [9735], '#e': [orderReferenceId!] }],
     options: { closeOnEose: false },
     enabled: Boolean(orderReferenceId),
   });
 
   const zapPayment = useCallback(async () => {
-    console.log('zapPayment');
+    console.log('[zapPayment]');
+    console.log('newEvent', newEvent);
+    console.log('userData', userData);
 
-    if (!newEvent || !userData) {
-      console.warn(
-        newEvent
-          ? ''
-          : 'Event not defined ' + userData
-          ? ''
-          : 'Data not defined'
-      );
+    if (!newEvent) {
+      console.warn('Event not defined ');
+
+      return;
+    }
+    if (!userData) {
+      console.warn('User data not defined ');
+
       return;
     }
 
-    const order = await claimOrderPayment(userData, newEvent);
+    await claimOrderPayment(userData, newEvent);
 
     setUserData(undefined);
     setNewEvent(undefined);
     setIsPaid(true);
-  }, [newEvent, userData, setNewEvent, claimOrderPayment, setIsPaid]);
+  }, [claimOrderPayment, setIsPaid]);
 
   useEffect(() => {
-    console.log('use effect');
-
-    if (events && events.length > 0 && userData) {
-      const event: Event = {
-        tags: events[0].tags as string[][],
-        content: events[0].content as string,
-        created_at: events[0].created_at as number,
-        pubkey: events[0].pubkey as string,
-        id: events[0].id as string,
-        kind: events[0].kind as number,
-        sig: events[0].sig as string,
-      };
-
-      restartSubscription();
+    if (events && events.length > 0) {
+      const event: Event = convertEvent(events[0]);
+      console.log('Event received', event);
 
       setNewEvent(event);
+
+      if (subscription) {
+        subscription.stop();
+        subscription.removeAllListeners();
+      }
 
       zapPayment();
     } else {
       console.warn('No event received to process payment');
     }
-  }, [userData, events, zapPayment, restartSubscription]);
+  }, [events]);
 
   const handleCreateOrder = useCallback(
     async (data: OrderUserData) => {
