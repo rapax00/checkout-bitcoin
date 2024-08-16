@@ -172,9 +172,16 @@ export default function Page() {
       requestNewOrder,
       setPaymentRequest,
       setOrderReferenceId,
-      // zapPayment,
     ]
   );
+
+  const backToPage = useCallback(() => {
+    setScreen('information');
+    setOrderReferenceId(undefined);
+    setTicketsQty(1);
+    setPaymentRequest(undefined);
+    setIsPaid(false);
+  }, [setOrderReferenceId, setTicketsQty, setPaymentRequest, setIsPaid]);
 
   useEffect(() => {
     if (isPaid) {
