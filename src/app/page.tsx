@@ -409,7 +409,11 @@ export default function Page() {
                   </div>
                 </Card>
                 <Link href="/">
-                  <Button className="w-full" variant="link">
+                  <Button
+                    className="w-full"
+                    variant="link"
+                    onClick={backToPage}
+                  >
                     Back to page
                   </Button>
                 </Link>
