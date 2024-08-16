@@ -43,35 +43,19 @@ export async function POST(req: NextRequest) {
   );
 
   // Sendy
-  // Always add to list
-  const sendyResponse = await sendy.subscribe({
-    name: fullname,
-    email,
-    listId: process.env.SENDY_LIST_ID!,
-  });
-
-  if (!sendyResponse.success) {
-    return NextResponse.json(
-      {
-        status: false,
-        errors: `Add to sendy list failed. ${sendyResponse.message}`,
-      },
-      { status: 404 }
-    );
-  }
-
-  // Unsuscribe from list
-  if (!newsletter) {
-    const sendyUnsubscribeResponse = await sendy.unsubscribe({
+  // Subscribe to newsletter
+  if (newsletter) {
+    const sendyResponse = await sendy.subscribe({
+      name: fullname,
       email,
       listId: process.env.SENDY_LIST_ID!,
     });
 
-    if (!sendyUnsubscribeResponse.success) {
+    if (!sendyResponse.success) {
       return NextResponse.json(
         {
           status: false,
-          errors: `Unsubscription to sendy list failed. ${sendyResponse.message}`,
+          errors: `Add to sendy list failed. ${sendyResponse.message}`,
         },
         { status: 404 }
       );
