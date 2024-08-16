@@ -122,13 +122,13 @@ function TimeIcon(props: any) {
       color="currentColor"
       fill="none"
     >
-      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" />
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
       <path
         d="M12 8V12L14 14"
         stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
