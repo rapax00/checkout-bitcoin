@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { Order, OrderRequest, OrderUserData } from '@/types/orders';
 import { Event } from 'nostr-tools';
 import { useLocalStorage } from 'usehooks-ts';
@@ -21,25 +21,24 @@ interface UseOrderReturn {
 }
 
 const useOrder = (): UseOrderReturn => {
-  const [ticketsQty, setTicketsQty] = useLocalStorage('tickets_qty', 1);
-  const [orderReferenceId, setOrderReferenceId] = useLocalStorage<
-    string | undefined
-  >('orderReference', undefined);
-  const [paymentRequest, setPaymentRequest] = useLocalStorage<
-    string | undefined
-  >('pay_req', undefined);
-  const [isPaid, setIsPaid] = useLocalStorage<boolean>('is_paid', false);
+  const [ticketsQty, setTicketsQty] = useState(1);
+  const [orderReferenceId, setOrderReferenceId] = useState<string | undefined>(
+    undefined
+  );
+  const [paymentRequest, setPaymentRequest] = useState<string | undefined>(
+    undefined
+  );
+  const [isPaid, setIsPaid] = useState<boolean>(false);
 
-  const [userData, setUserData, removeUserData] =
-    useLocalStorage<OrderUserData>('userData', {
-      fullname: '',
-      email: '',
-      newsletter: false,
-    });
+  // const [userData, setUserData, removeUserData] =
+  //   useLocalStorage<OrderUserData>('userData', {
+  //     fullname: '',
+  //     email: '',
+  //     newsletter: false,
+  //   });
 
   const requestNewOrder = useCallback(
     async (data: OrderRequest): Promise<Order> => {
-      console.log('Requesting new order:', data);
       try {
         const response = await fetch('/api/ticket/request', {
           method: 'POST',
