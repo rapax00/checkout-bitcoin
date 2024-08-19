@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
     const sendyResponse = await sendy.subscribe({
       name: fullname,
       email,
-      listId: process.env.SENDY_LIST_ID!,
+      listId: process.env.SENDY_LIST!,
     });
 
     if (!sendyResponse.success) {

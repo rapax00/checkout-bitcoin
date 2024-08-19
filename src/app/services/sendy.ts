@@ -4,14 +4,14 @@ import {
   SendyUnsubscribeParams,
   SendyResponse,
   SendySubscriptionStatusParams,
-} from "../types/sendy";
+} from '../types/sendy';
 
 class SendyClient implements SendyClientInterface {
   private apiUrl: string;
   private apiKey: string;
 
   constructor(apiUrl: string, apiKey: string) {
-    this.apiUrl = "https://" + apiUrl + "/sendy";
+    this.apiUrl = 'https://' + apiUrl + '/sendy';
     this.apiKey = apiKey;
   }
 
@@ -30,7 +30,7 @@ class SendyClient implements SendyClientInterface {
     if (subscriptionStatus.success) {
       const responseF: SendyResponse = {
         success: true,
-        message: "Already subscribed",
+        message: 'Already subscribed',
       };
 
       return responseF;
@@ -39,18 +39,18 @@ class SendyClient implements SendyClientInterface {
     // Create form data
     const formData = new URLSearchParams();
 
-    formData.append("api_key", this.apiKey);
-    formData.append("name", name);
-    formData.append("email", email);
-    formData.append("list", listId);
-    formData.append("boolean", "true");
+    formData.append('api_key', this.apiKey);
+    formData.append('name', name);
+    formData.append('email', email);
+    formData.append('list', listId);
+    formData.append('boolean', 'true');
 
     try {
       // Send request
-      const response = await fetch(this.apiUrl + "/subscribe", {
-        method: "POST",
+      const response = await fetch(this.apiUrl + '/subscribe', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: formData.toString(),
       });
@@ -58,7 +58,7 @@ class SendyClient implements SendyClientInterface {
       const responseText = await response.text();
 
       const responseF: SendyResponse = {
-        success: responseText == "1" ? true : false,
+        success: responseText == '1' ? true : false,
         message: responseText,
       };
 
@@ -79,17 +79,17 @@ class SendyClient implements SendyClientInterface {
     // Create form data
     const formData = new URLSearchParams();
 
-    formData.append("api_key", this.apiKey);
-    formData.append("email", email);
-    formData.append("list", listId);
-    formData.append("boolean", "true");
+    formData.append('api_key', this.apiKey);
+    formData.append('email', email);
+    formData.append('list', listId);
+    formData.append('boolean', 'true');
 
     try {
       // Send request
-      const response = await fetch(this.apiUrl + "/unsubscribe", {
-        method: "POST",
+      const response = await fetch(this.apiUrl + '/unsubscribe', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: formData.toString(),
       });
@@ -97,7 +97,7 @@ class SendyClient implements SendyClientInterface {
       const responseText = await response.text();
 
       const responseF: SendyResponse = {
-        success: responseText == "1" ? true : false,
+        success: responseText == '1' ? true : false,
         message: responseText,
       };
 
@@ -120,18 +120,18 @@ class SendyClient implements SendyClientInterface {
     // Create form data
     const formData = new URLSearchParams();
 
-    formData.append("api_key", this.apiKey);
-    formData.append("email", email);
-    formData.append("list_id", listId);
+    formData.append('api_key', this.apiKey);
+    formData.append('email', email);
+    formData.append('list_id', listId);
 
     try {
       // Send request
       const response = await fetch(
-        this.apiUrl + "/api/subscribers/subscription-status.php",
+        this.apiUrl + '/api/subscribers/subscription-status.php',
         {
-          method: "POST",
+          method: 'POST',
           headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
+            'Content-Type': 'application/x-www-form-urlencoded',
           },
           body: formData.toString(),
         }
@@ -140,7 +140,7 @@ class SendyClient implements SendyClientInterface {
       const responseText = await response.text();
 
       const responseF: SendyResponse = {
-        success: responseText == "Subscribed" ? true : false,
+        success: responseText == 'Subscribed' ? true : false,
         message: responseText,
       };
 
@@ -157,6 +157,6 @@ class SendyClient implements SendyClientInterface {
 }
 
 export const sendy: SendyClientInterface = new SendyClient(
-  process.env.SENDY_API_URL!,
-  process.env.SENDY_API_KEY!
+  process.env.SENDY_URL!,
+  process.env.SENDY_KEY!
 );
