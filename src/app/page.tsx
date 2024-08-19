@@ -48,6 +48,8 @@ import { MinusIcon } from '@/components/icons/MinusIcon';
 
 import useOrder from '@/hooks/useOrder';
 import { convertEvent } from './lib/utils/nostr';
+import { calculateTicketPrice } from './lib/utils/price';
+import { set } from 'zod';
 
 // Mock data
 const TICKET = {
@@ -55,7 +57,7 @@ const TICKET = {
   description:
     'Lorem ipsum dolor sit amet consectetur adipisicing elit. Reprehenderit impedit aperiam, optio dolores tenetur earum.',
   imageUrl: 'https://placehold.co/400',
-  value: 1,
+  value: parseInt(process.env.TICKET_PRICE!),
   valueType: 'SAT',
 };
 
@@ -99,22 +101,22 @@ export default function Page() {
       const event: Event = convertEvent(events[0]);
 
       if (!event) {
-      console.warn('Event not defined ');
+        console.warn('Event not defined ');
 
-      return;
-    }
+        return;
+      }
 
-    if (!userData) {
-      console.warn('User data not defined ');
+      if (!userData) {
+        console.warn('User data not defined ');
 
-      return;
-    }
+        return;
+      }
 
       await claimOrderPayment(userData, event);
 
-    setUserData(undefined);
-    setNewEvent(undefined);
-    setIsPaid(true);
+      setUserData(undefined);
+      setNewEvent(undefined);
+      setIsPaid(true);
     };
 
     events && events.length > 0 && processPayment();
@@ -165,6 +167,19 @@ export default function Page() {
     setIsPaid(false);
   }, [setOrderReferenceId, setTicketsQty, setPaymentRequest, setIsPaid]);
 
+  const [ticketsValue, setTicketsValue] = useState<number>(0);
+
+  useEffect(() => {
+    const calculateValue = async () => {
+      const total = Math.round(
+        (await calculateTicketPrice(ticketsQty, TICKET.value)) / 1000
+      );
+      setTicketsValue(total);
+    };
+
+    calculateValue();
+  }, [ticketsQty]);
+
   useEffect(() => {
     if (isPaid) {
       setScreen('summary');
@@ -198,7 +213,7 @@ export default function Page() {
                     <div>
                       <h2 className="text-md">{TICKET.title}</h2>
                       <p className="font-semibold text-lg">
-                        {TICKET.value} {TICKET.valueType}
+                        {TICKET.value} {' ARS'}
                       </p>
                     </div>
                     <div className="flex gap-2 items-center">
@@ -241,7 +256,9 @@ export default function Page() {
                   <div className="flex gap-4 justify-between items-center">
                     <p className="text-text">Total</p>
                     <p className="font-bold text-md">
-                      {TICKET.value * ticketsQty} {TICKET.valueType}
+                      {ticketsValue
+                        ? ticketsValue + ' ' + TICKET.valueType
+                        : 'Calculating...'}
                     </p>
                   </div>
                 </div>
@@ -268,7 +285,7 @@ export default function Page() {
                           <div>
                             <h2 className="text-md">{TICKET.title}</h2>
                             <p className="font-semibold text-lg">
-                              {TICKET.value} {TICKET.valueType}
+                              {TICKET.value} {' ARS'}
                             </p>
                           </div>
                           <div className="flex gap-2 items-center">
@@ -299,7 +316,7 @@ export default function Page() {
                       <div>
                         <h2 className="text-md">{TICKET.title}</h2>
                         <p className="font-semibold text-lg">
-                          {TICKET.value} {TICKET.valueType}
+                          {TICKET.value} {' ARS'}
                         </p>
                       </div>
                       <div className="flex gap-2 items-center">
