@@ -14,12 +14,46 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { decodeInvoice } from '@lawallet/react';
+import { useEffect, useState } from 'react';
 
 interface FormPaymentProps {
   invoice?: string;
 }
 
 export function FormPayment({ invoice }: FormPaymentProps) {
+  const [timeRemaining, setTimeRemaining] = useState<number>(0);
+
+  useEffect(() => {
+    const invoiceExpireDate = decodeInvoice(invoice!)?.timeExpireDate;
+
+    if (invoiceExpireDate) {
+      const calculateTimeRemaining = () => {
+        const now = new Date().getTime();
+        const timeLeft = invoiceExpireDate - now / 1000;
+        return Math.max(Math.floor(timeLeft), 0);
+      };
+
+      setTimeRemaining(calculateTimeRemaining());
+
+      const timer = setInterval(() => {
+        setTimeRemaining(calculateTimeRemaining());
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [invoice]);
+
+  const formatTime = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(
+      2,
+      '0'
+    )}:${String(secs).padStart(2, '0')}`;
+  };
+
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(invoice!);
@@ -35,7 +69,9 @@ export function FormPayment({ invoice }: FormPaymentProps) {
           <p className="text-sm text-text">Time:</p>
           <div className="flex gap-2 items-center justify-center">
             <TimeIcon className="w-4 h-4" />
-            <span className="font-semibold text-sm">09:45</span>
+            <span className="font-semibold text-sm">
+              {formatTime(timeRemaining)}
+            </span>
           </div>
         </div>
 
