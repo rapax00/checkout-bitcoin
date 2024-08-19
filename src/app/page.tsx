@@ -94,45 +94,30 @@ export default function Page() {
     enabled: Boolean(orderReferenceId),
   });
 
-  const zapPayment = useCallback(async () => {
-    console.log('[zapPayment]');
-    console.log('newEvent', newEvent);
-    console.log('userData', userData);
+  useEffect(() => {
+    const processPayment = async () => {
+      const event: Event = convertEvent(events[0]);
 
-    if (!newEvent) {
+      if (!event) {
       console.warn('Event not defined ');
 
       return;
     }
+
     if (!userData) {
       console.warn('User data not defined ');
 
       return;
     }
 
-    await claimOrderPayment(userData, newEvent);
+      await claimOrderPayment(userData, event);
 
     setUserData(undefined);
     setNewEvent(undefined);
     setIsPaid(true);
-  }, [claimOrderPayment, setIsPaid]);
+    };
 
-  useEffect(() => {
-    if (events && events.length > 0) {
-      const event: Event = convertEvent(events[0]);
-      console.log('Event received', event);
-
-      setNewEvent(event);
-
-      if (subscription) {
-        subscription.stop();
-        subscription.removeAllListeners();
-      }
-
-      zapPayment();
-    } else {
-      console.warn('No event received to process payment');
-    }
+    events && events.length > 0 && processPayment();
   }, [events]);
 
   const handleCreateOrder = useCallback(
