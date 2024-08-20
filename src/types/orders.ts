@@ -9,7 +9,7 @@ export interface OrderRequest extends OrderUserData {
 }
 
 export interface Order extends OrderRequest {
-  total: number;
+  totalMiliSats: number;
   pr: string;
   orderReferenceId: string;
 }

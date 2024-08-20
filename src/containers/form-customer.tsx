@@ -68,6 +68,7 @@ export function FormCustomer({ onSubmit }: FormCustomerProps) {
                     type='text'
                     id='fullname'
                     name='fullname'
+                    minLength={3}
                     placeholder='Satoshi Nakamoto'
                     required
                     onChange={(e) => setFullname(e.target.value)}

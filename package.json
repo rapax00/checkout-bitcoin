@@ -13,7 +13,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@lawallet/react": "^0.2.12",
+    "@lawallet/react": "^0.2.16",
     "@prisma/client": "5.18.0",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.1",
@@ -28,6 +28,7 @@
     "@radix-ui/react-separator": "^1.1.0",
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-tabs": "^1.1.0",
+    "axios": "^1.7.3",
     "@supabase/supabase-js": "^2.45.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
@@ -36,7 +37,7 @@
     "input-otp": "^1.2.4",
     "lucide-react": "^0.419.0",
     "next": "14.2.5",
-    "nostr-tools": "^2.7.1",
+    "nostr-tools": "npm:@lawallet/nostr-tools@^1.17.0",
     "qrcode.react": "^3.1.0",
     "react": "^18",
     "react-canvas-confetti": "^2.0.7",
@@ -57,5 +58,14 @@
     "prisma": "^5.18.0",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
+  },
+  "packageManager": "pnpm@8.14.1",
+  "overrides": {
+    "nostr-tools": "npm:@lawallet/nostr-tools"
+  },
+  "pnpm": {
+    "overrides": {
+      "nostr-tools": "npm:@lawallet/nostr-tools"
+    }
   }
 }

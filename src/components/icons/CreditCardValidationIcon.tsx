@@ -30,7 +30,7 @@ export function CreditCardValidationIcon(props: any) {
         d='M10 18H11.5'
         stroke='currentColor'
         strokeWidth='1.5'
-        stroke-miterlimit='10'
+        strokeMiterlimit='10'
         strokeLinecap='round'
         strokeLinejoin='round'
       />
@@ -38,7 +38,7 @@ export function CreditCardValidationIcon(props: any) {
         d='M14.5 18L18 18'
         stroke='currentColor'
         strokeWidth='1.5'
-        stroke-miterlimit='10'
+        strokeMiterlimit='10'
         strokeLinecap='round'
         strokeLinejoin='round'
       />
