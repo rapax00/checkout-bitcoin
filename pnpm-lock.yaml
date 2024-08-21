@@ -8,9 +8,9 @@ overrides:
   nostr-tools: npm:@lawallet/nostr-tools
 
 dependencies:
-  '@aws-sdk/client-ses':
-    specifier: ^3.635.0
-    version: 3.636.0
+  '@aws-sdk/client-sesv2':
+    specifier: ^3.633.0
+    version: 3.635.0
   '@lawallet/react':
     specifier: ^0.2.16
     version: 0.2.16(react@18.3.1)(typescript@5.5.4)
@@ -184,8 +184,8 @@ packages:
       tslib: 2.6.3
     dev: false
 
-  /@aws-sdk/client-ses@3.636.0:
-    resolution: {integrity: sha512-72LwrowWBR4W6ilkc1AIBJZV7UbA9YvmqfHyh+D+Ek7VK65cW9mskLE9rFX/uI4CzupCSxVvEy2d23M/6w+Saw==}
+  /@aws-sdk/client-sesv2@3.635.0:
+    resolution: {integrity: sha512-9zfgV5/8KYVr88nLatxFKQw+eL/uAGxlL3ZKS3rXhdG6nIXyjR0BYT1y6PBJy172In+LImGzIA1RHHVV0ethoA==}
     engines: {node: '>=16.0.0'}
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
@@ -228,7 +228,6 @@ packages:
       '@smithy/util-middleware': 3.0.3
       '@smithy/util-retry': 3.0.3
       '@smithy/util-utf8': 3.0.0
-      '@smithy/util-waiter': 3.1.2
       tslib: 2.6.3
     transitivePeerDependencies:
       - aws-crt
@@ -2209,15 +2208,6 @@ packages:
     engines: {node: '>=16.0.0'}
     dependencies:
       '@smithy/util-buffer-from': 3.0.0
-      tslib: 2.6.3
-    dev: false
-
-  /@smithy/util-waiter@3.1.2:
-    resolution: {integrity: sha512-4pP0EV3iTsexDx+8PPGAKCQpd/6hsQBaQhqWzU4hqKPHN5epPsxKbvUTIiYIHTxaKt6/kEaqPBpu/ufvfbrRzw==}
-    engines: {node: '>=16.0.0'}
-    dependencies:
-      '@smithy/abort-controller': 3.1.1
-      '@smithy/types': 3.3.0
       tslib: 2.6.3
     dev: false
 
