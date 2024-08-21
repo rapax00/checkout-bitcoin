@@ -75,6 +75,8 @@ export default function Page() {
     undefined
   );
 
+  const [ticketsValue, setTicketsValue] = useState<number>(0);
+
   // Hooks
   const {
     orderReferenceId,
@@ -166,8 +168,6 @@ export default function Page() {
     setPaymentRequest(undefined);
     setIsPaid(false);
   }, [setOrderReferenceId, setTicketsQty, setPaymentRequest, setIsPaid]);
-
-  const [ticketsValue, setTicketsValue] = useState<number>(0);
 
   useEffect(() => {
     const calculateValue = async () => {
@@ -275,7 +275,9 @@ export default function Page() {
                       <div className="flex items-center justify-between gap-2 w-full">
                         Show order summary
                         <p className="font-bold text-lg no-underline">
-                          {TICKET.value * ticketsQty} {TICKET.valueType}
+                          {ticketsValue
+                            ? ticketsValue + ' ' + TICKET.valueType
+                            : 'Calculating...'}
                         </p>
                       </div>
                     </AccordionTrigger>
@@ -302,7 +304,9 @@ export default function Page() {
                         <div className="flex gap-4 justify-between items-center">
                           <p className="text-text text-md">Total</p>
                           <p className="font-bold text-md">
-                            {TICKET.value * ticketsQty} {TICKET.valueType}
+                            {ticketsValue
+                              ? ticketsValue + ' ' + TICKET.valueType
+                              : 'Calculating...'}
                           </p>
                         </div>
                       </div>
@@ -333,7 +337,9 @@ export default function Page() {
                     <div className="flex gap-4 justify-between items-center">
                       <p className="text-text">Total</p>
                       <p className="font-bold text-md">
-                        {TICKET.value * ticketsQty} {TICKET.valueType}
+                        {ticketsValue
+                          ? ticketsValue + ' ' + TICKET.valueType
+                          : 'Calculating...'}
                       </p>
                     </div>
                   </div>
