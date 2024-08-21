@@ -57,8 +57,11 @@ export function FormPayment({ invoice }: FormPaymentProps) {
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(invoice!);
-    } catch (err) {
-      console.error('Failed to copy text: ', err);
+      alert('Text copied to clipboard'); // TODO: use lawallet notification
+    } catch (error: any) {
+      alert('Failed to copy text: ' + error.message); // TODO: use lawallet notification
+    }
+  };
     }
   };
 
