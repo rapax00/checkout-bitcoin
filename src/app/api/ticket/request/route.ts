@@ -5,6 +5,7 @@ import { generateInvoice, getLnurlpFromWalias } from '@/app/services/ln';
 import { createOrder, CreateOrderResponse } from '@/app/lib/utils/prisma';
 import { ticketSchema } from '@/app/lib/validation/ticketSchema';
 import { sendy } from '@/app/services/sendy';
+import { ses } from '@/app/services/ses';
 
 interface RequestTicketResponse {
   pr: string;
@@ -50,6 +51,16 @@ export async function POST(req: NextRequest) {
       email,
       listId: process.env.SENDY_LIST!,
     });
+
+    // AWS SES
+    try {
+      await ses.sendEmailNewsletter(email);
+    } catch (error) {
+      return NextResponse.json(
+        { status: false, errors: error },
+        { status: 500 }
+      );
+    }
 
     if (!sendyResponse.success) {
       return NextResponse.json(

@@ -8,6 +8,8 @@ const nextConfig = {
     SENDY_URL: process.env.SENDY_API_URL,
     SENDY_KEY: process.env.SENDY_API_KEY,
     SENDY_LIST: process.env.SENDY_LIST_ID,
+    AWS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
+    AWS_SECRET_KEY: process.env.AWS_SECRET_ACCESS_KEY,
   },
   images: {
     remotePatterns: [

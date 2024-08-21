@@ -1,3 +1,4 @@
+import { ses } from './../../../services/ses';
 import { updateOrder, updateOrderResponse } from './../../../lib/utils/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import { getPublicKey, validateEvent } from 'nostr-tools';
@@ -56,9 +57,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Validate zapRequest
-  const publicKey = getPublicKey(
-    Uint8Array.from(Buffer.from(process.env.SIGNER_PRIVATE_KEY!, 'hex'))
-  );
+  const publicKey = getPublicKey(process.env.SIGNER_KEY!);
   const isValidZapRequest = validateZapRequest(zapReceipt, publicKey);
 
   if (!isValidZapRequest) {
@@ -74,6 +73,13 @@ export async function POST(req: NextRequest) {
     email,
     zapReceipt
   );
+
+  // AWS SES
+  try {
+    await ses.sendEmailOrder(email, updateOrderResponse.referenceId);
+  } catch (error) {
+    return NextResponse.json({ status: false, errors: error }, { status: 500 });
+  }
 
   // Response
   const response: TicketClaimResponse = {
