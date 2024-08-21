@@ -62,6 +62,16 @@ export function FormPayment({ invoice }: FormPaymentProps) {
       alert('Failed to copy text: ' + error.message); // TODO: use lawallet notification
     }
   };
+
+  const payWithWebLN = async () => {
+    try {
+      if (!window.webln) {
+        throw new Error('WebLN not detected');
+      }
+      await window.webln.enable();
+      await window.webln.sendPayment(invoice!);
+    } catch (error: any) {
+      alert('Error paying invoice: ' + error.message); // TODO: use lawallet notification
     }
   };
 
@@ -114,7 +124,7 @@ export function FormPayment({ invoice }: FormPaymentProps) {
                 <Button
                   variant="secondary"
                   className="w-full"
-                  onClick={() => null}
+                  onClick={payWithWebLN}
                 >
                   Pay with wallet
                 </Button>
