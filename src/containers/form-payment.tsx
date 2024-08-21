@@ -93,7 +93,7 @@ export function FormPayment({ invoice }: FormPaymentProps) {
                 <div className="max-w-[300px] mx-auto">
                   {invoice ? (
                     <QRCodeSVG
-                      value={invoice}
+                      value={invoice.toUpperCase()}
                       size={300}
                       imageSettings={{
                         // Iso 24x24, image 42x42
