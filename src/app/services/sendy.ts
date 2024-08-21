@@ -11,7 +11,7 @@ class SendyClient implements SendyClientInterface {
   private apiKey: string;
 
   constructor(apiUrl: string, apiKey: string) {
-    this.apiUrl = 'https://' + apiUrl + '/sendy';
+    this.apiUrl = apiUrl;
     this.apiKey = apiKey;
   }
 
