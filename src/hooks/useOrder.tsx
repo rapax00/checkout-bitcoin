@@ -68,7 +68,7 @@ const useOrder = (): UseOrderReturn => {
         });
       } catch (error: any) {
         console.error(error.message);
-        alert(error.message);
+        // alert(error.message);
         throw error;
       }
     },
@@ -122,7 +122,7 @@ const useOrder = (): UseOrderReturn => {
       });
     } catch (error: any) {
       console.error(error.message);
-      alert(error.message);
+      // alert(error.message);
       throw error;
     }
   };
