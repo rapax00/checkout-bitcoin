@@ -98,6 +98,7 @@ export default function Page() {
     enabled: Boolean(orderReferenceId),
   });
 
+  // Process payment
   useEffect(() => {
     const processPayment = async () => {
       try {
@@ -127,6 +128,7 @@ export default function Page() {
     events && events.length > 0 && processPayment();
   }, [events]);
 
+  // UI Button "Confirm order"
   const handleCreateOrder = useCallback(
     async (data: OrderUserData) => {
       if (isLoading) return;
@@ -165,6 +167,7 @@ export default function Page() {
     ]
   );
 
+  // UI Button "Back to page"
   const backToPage = useCallback(() => {
     setScreen('information');
     setOrderReferenceId(undefined);
@@ -173,6 +176,7 @@ export default function Page() {
     setIsPaid(false);
   }, [setOrderReferenceId, setTicketsQty, setPaymentRequest, setIsPaid]);
 
+  // Calculate ticket price
   useEffect(() => {
     const calculateValue = async () => {
       try {
@@ -201,7 +205,11 @@ export default function Page() {
   }, []);
 
   if (isLoading) {
-    return <></>;
+    return (
+      <>
+        <p>Cargando...</p>
+      </>
+    );
   }
 
   return (
