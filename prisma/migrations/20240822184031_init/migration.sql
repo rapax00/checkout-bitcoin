@@ -12,6 +12,7 @@ CREATE TABLE "Order" (
     "qty" INTEGER NOT NULL,
     "totalMiliSats" INTEGER NOT NULL,
     "paid" BOOLEAN NOT NULL DEFAULT false,
+    "checkIn" BOOLEAN NOT NULL DEFAULT false,
     "zapReceiptId" TEXT,
     "userId" TEXT NOT NULL,
     CONSTRAINT "Order_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE

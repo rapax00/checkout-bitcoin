@@ -23,6 +23,7 @@ model Order {
     qty           Int
     totalMiliSats Int
     paid          Boolean @default(false)
+    checkIn       Boolean @default(false)
     zapReceiptId  String? @unique
     userId        String
 
