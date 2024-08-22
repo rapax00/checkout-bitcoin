@@ -68,6 +68,7 @@ export default function Page() {
 
   // Dialog for reset invoice
   const [open, setOpen] = useState<boolean>(false);
+  const [alertText, setAlertText] = useState<string>('Try again.');
 
   // Claim invoice
   const [newEvent, setNewEvent] = useState<Event | undefined>(undefined);
@@ -120,8 +121,8 @@ export default function Page() {
         setNewEvent(undefined);
         setIsPaid(true);
       } catch (error: any) {
-        alert(`Error processing payment: ${error.message}`);
-        console.error('Error processing payment:', error);
+        setOpen(true);
+        setAlertText(error.message);
       }
     };
 
@@ -151,8 +152,8 @@ export default function Page() {
 
         setUserData(data);
       } catch (error: any) {
-        console.error('Error creating order:', error.message);
-        alert(`Error creating order: ${error.message}`);
+        setOpen(true);
+        setAlertText(error.message);
       } finally {
         setIsloading(false);
       }
@@ -186,7 +187,6 @@ export default function Page() {
 
         setTicketsValue(total);
       } catch (error: any) {
-        alert(`Error calculating ticket price: ${error.message}`);
         console.error('Error calculating ticket price:', error);
       }
     };
@@ -454,16 +454,16 @@ export default function Page() {
               Oops! Try again
             </AlertDialogTitle>
             <AlertDialogDescription className="text-center">
-              {`It looks like you weren't able to complete the transaction in time.`}
+              {alertText}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="flex-1 p-0">
-              <Button className="w-full" variant="secondary" tabIndex={-1}>
-                Cancel
-              </Button>
+            <AlertDialogCancel className="flex-1 p-0" onClick={backToPage}>
+              {/* <Button className="w-full" variant="secondary" tabIndex={-1}> */}
+              Reload
+              {/* </Button> */}
             </AlertDialogCancel>
-            <AlertDialogAction className="flex-1">Try again</AlertDialogAction>
+            {/* <AlertDialogAction className="flex-1">Try again</AlertDialogAction> */}
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
