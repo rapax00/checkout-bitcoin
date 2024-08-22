@@ -92,4 +92,34 @@ async function updateOrder(
 
   return response;
 }
+
+async function getOrder(referenceId: string): Promise<Order | null> {
+  const order: Order | null = await prisma.order.findUnique({
+    where: {
+      referenceId,
+    },
+  });
+
+  if (!order) {
+    throw new Error('Order not found');
+  }
+
+  return order;
+}
+
+async function checkInOrder(referenceId: string) {
+  const order: Order | null = await prisma.order.update({
+    where: {
+      referenceId: referenceId,
+    },
+    data: {
+      checkIn: true,
+    },
+  });
+
+  if (!order) {
+    throw new Error('Error checking in order');
+  }
+}
+
 export { createOrder, updateOrder, getOrder, checkInOrder };
