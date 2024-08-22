@@ -5,6 +5,7 @@ const nextConfig = {
     SUPABASE_SECRET: process.env.SUPABASE_API_TOKEN,
     SIGNER_KEY: process.env.SIGNER_PRIVATE_KEY,
     TICKET_PRICE: process.env.TICKET_PRICE_ARS,
+    PASSWORD: process.env.ADMIN_PASSWORD,
     SENDY_URL: process.env.SENDY_API_URL,
     SENDY_KEY: process.env.SENDY_API_KEY,
     SENDY_LIST: process.env.SENDY_LIST_ID,
