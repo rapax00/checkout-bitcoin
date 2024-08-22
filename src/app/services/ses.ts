@@ -59,6 +59,7 @@ class SESClient implements SESClientInterface {
                             <div class="container">
                               <h1>Tu entrada</h1>
                               <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${orderId}" alt="QR Code">
+                              <p>ID: ${orderId}<p>
                               <p>Saludos,<br>La Crypta</p>
                               <div class="footer">
                                 <p>&copy; 2024 La Crypta. 2024 La Crypta. Todos los derechos reservados.</p>
