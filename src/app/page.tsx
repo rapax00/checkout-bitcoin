@@ -100,25 +100,28 @@ export default function Page() {
 
   useEffect(() => {
     const processPayment = async () => {
-      const event: Event = convertEvent(events[0]);
+      try {
+        const event: Event = convertEvent(events[0]);
 
-      if (!event) {
-        console.warn('Event not defined ');
+        if (!event) {
+          console.warn('Event not defined ');
+          return;
+        }
 
-        return;
+        if (!userData) {
+          console.warn('User data not defined ');
+          return;
+        }
+
+        await claimOrderPayment(userData, event);
+
+        setUserData(undefined);
+        setNewEvent(undefined);
+        setIsPaid(true);
+      } catch (error: any) {
+        alert(`Error processing payment: ${error.message}`);
+        console.error('Error processing payment:', error);
       }
-
-      if (!userData) {
-        console.warn('User data not defined ');
-
-        return;
-      }
-
-      await claimOrderPayment(userData, event);
-
-      setUserData(undefined);
-      setNewEvent(undefined);
-      setIsPaid(true);
     };
 
     events && events.length > 0 && processPayment();
@@ -145,8 +148,9 @@ export default function Page() {
         });
 
         setUserData(data);
-      } catch {
-        alert('Error creating order');
+      } catch (error: any) {
+        console.error('Error creating order:', error.message);
+        alert(`Error creating order: ${error.message}`);
       } finally {
         setIsloading(false);
       }
@@ -171,10 +175,16 @@ export default function Page() {
 
   useEffect(() => {
     const calculateValue = async () => {
-      const total = Math.round(
-        (await calculateTicketPrice(ticketsQty, TICKET.value)) / 1000
-      );
-      setTicketsValue(total);
+      try {
+        const total = Math.round(
+          (await calculateTicketPrice(ticketsQty, TICKET.value)) / 1000
+        );
+
+        setTicketsValue(total);
+      } catch (error: any) {
+        alert(`Error calculating ticket price: ${error.message}`);
+        console.error('Error calculating ticket price:', error);
+      }
     };
 
     calculateValue();

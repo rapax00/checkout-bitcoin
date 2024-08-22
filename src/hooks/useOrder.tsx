@@ -30,13 +30,6 @@ const useOrder = (): UseOrderReturn => {
   );
   const [isPaid, setIsPaid] = useState<boolean>(false);
 
-  // const [userData, setUserData, removeUserData] =
-  //   useLocalStorage<OrderUserData>('userData', {
-  //     fullname: '',
-  //     email: '',
-  //     newsletter: false,
-  //   });
-
   const requestNewOrder = useCallback(
     async (data: OrderRequest): Promise<Order> => {
       try {
@@ -49,10 +42,12 @@ const useOrder = (): UseOrderReturn => {
         });
 
         if (!response.ok) {
-          throw new Error('Failed to create order');
+          const errorData = await response.json();
+          throw new Error(`${errorData.errors || response.statusText}`);
         }
 
         const result: { status: string; data: Order } = await response.json();
+
         setOrderReferenceId(result.data.orderReferenceId);
         setPaymentRequest(result.data.pr);
         setIsPaid(false);
@@ -71,8 +66,9 @@ const useOrder = (): UseOrderReturn => {
             setIsPaid(false);
           }, 1000);
         });
-      } catch (error) {
-        console.error('Error creating order:', error);
+      } catch (error: any) {
+        console.error(error.message);
+        alert(error.message);
         throw error;
       }
     },
@@ -82,7 +78,6 @@ const useOrder = (): UseOrderReturn => {
   const clear = useCallback(() => {
     setOrderReferenceId(undefined);
     setPaymentRequest(undefined);
-
     setIsPaid(false);
   }, [setIsPaid, setOrderReferenceId, setPaymentRequest]);
 
@@ -106,14 +101,11 @@ const useOrder = (): UseOrderReturn => {
       });
 
       if (!response.ok) {
-        const body = await response.json();
-
-        console.log('ERROR: ', body.errors);
-
-        throw new Error('Failed to claim order payment');
+        const errorData = await response.json();
+        throw new Error(`${errorData.errors || response.statusText}`);
       }
 
-      const result: { status: string; data: Order } = await response.json(); // pr is not returned in the response
+      const result: { status: string; data: Order } = await response.json();
       setIsPaid(true);
 
       return new Promise((resolve) => {
@@ -128,8 +120,9 @@ const useOrder = (): UseOrderReturn => {
           });
         }, 1000);
       });
-    } catch (error) {
-      console.error('Error claiming order payment:', error);
+    } catch (error: any) {
+      console.error(error.message);
+      alert(error.message);
       throw error;
     }
   };
