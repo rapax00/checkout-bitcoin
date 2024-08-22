@@ -92,7 +92,7 @@ export default function Page() {
     clear,
   } = useOrder();
 
-  const { events, subscription } = useSubscription({
+  const { events } = useSubscription({
     filters: [{ kinds: [9735], '#e': [orderReferenceId!] }],
     options: { closeOnEose: false },
     enabled: Boolean(orderReferenceId),
