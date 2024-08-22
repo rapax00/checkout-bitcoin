@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
 
       if (!sendyResponse.success) {
         throw new AppError(
-          `Add to Sendy list failed. ${sendyResponse.message}`,
+          `Subscribe to newsletter failed. ${sendyResponse.message}`,
           404
         );
       }
