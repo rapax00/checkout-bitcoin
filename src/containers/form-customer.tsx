@@ -22,7 +22,7 @@ export function FormCustomer({ onSubmit }: FormCustomerProps) {
   // Form
   const [fullname, setFullname] = useState<string>("");
   const [email, setEmail] = useState<string>("");
-  const [newsletter, setNewsletter] = useState<boolean>(false);
+  const [newsletter, setNewsletter] = useState<boolean>(true);
   const [message, setMessage] = useState("");
 
   const [loading, setLoading] = useState<boolean>(false);
