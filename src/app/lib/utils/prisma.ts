@@ -1,8 +1,8 @@
-import { prisma } from "@/app/services/prismaClient";
-import { Order, User } from "@prisma/client";
-import { randomBytes } from "crypto";
-import { calculateTicketPrice } from "./price";
-import { Event } from "nostr-tools";
+import { prisma } from '@/app/services/prismaClient';
+import { Order, User } from '@prisma/client';
+import { randomBytes } from 'crypto';
+import { calculateTicketPrice } from './price';
+import { Event } from 'nostr-tools';
 
 export interface CreateOrderResponse {
   totalMiliSats: number;
@@ -17,7 +17,7 @@ export interface updateOrderResponse {
   paid: boolean;
 }
 
-export async function createOrder(
+async function createOrder(
   fullname: string,
   email: string,
   qty: number
@@ -30,7 +30,7 @@ export async function createOrder(
     create: { fullname, email },
   });
 
-  const referenceId: string = randomBytes(32).toString("hex");
+  const referenceId: string = randomBytes(32).toString('hex');
   const ticketPriceArs: number = parseInt(process.env.TICKET_PRICE_ARS!);
   const totalMiliSats = await calculateTicketPrice(qty, ticketPriceArs);
 
@@ -51,12 +51,12 @@ export async function createOrder(
   return response;
 }
 
-export async function updateOrder(
+async function updateOrder(
   fullname: string,
   email: string,
   zapReceipt: Event
 ): Promise<updateOrderResponse> {
-  const orderReferenceId = zapReceipt.tags.find((tag) => tag[0] === "e")![1];
+  const orderReferenceId = zapReceipt.tags.find((tag) => tag[0] === 'e')![1];
 
   // Update order to paid
   const order: Order | null = await prisma.order.update({
@@ -79,7 +79,7 @@ export async function updateOrder(
   });
 
   if (!order || !user) {
-    throw new Error("Order or user not found");
+    throw new Error('Order or user not found');
   }
 
   const response: updateOrderResponse = {
@@ -92,3 +92,4 @@ export async function updateOrder(
 
   return response;
 }
+export { createOrder, updateOrder, getOrder, checkInOrder };
