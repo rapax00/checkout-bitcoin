@@ -111,10 +111,10 @@ async function getOrder(referenceId: string): Promise<Order | null> {
   return order;
 }
 
-async function checkInOrder(referenceId: string) {
+async function checkInOrder(ticketId: string) {
   const order: Order | null = await prisma.order.update({
     where: {
-      referenceId: referenceId,
+      ticketId,
     },
     data: {
       checkIn: true,
