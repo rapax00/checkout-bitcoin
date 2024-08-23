@@ -204,13 +204,13 @@ export default function Page() {
     setIsloading(false);
   }, []);
 
-  if (isLoading) {
-    return (
-      <>
-        <p>Cargando...</p>
-      </>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <>
+  //       <p>Cargando...</p>
+  //     </>
+  //   );
+  // }
 
   return (
     <>
