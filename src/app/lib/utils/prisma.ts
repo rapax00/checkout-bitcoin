@@ -11,6 +11,7 @@ export interface CreateOrderResponse {
 
 export interface updateOrderResponse {
   referenceId: string;
+  ticketId: string;
   qty: number;
   totalMiliSats: number;
   zapReceiptId: string;
@@ -57,6 +58,7 @@ async function updateOrder(
   zapReceipt: Event
 ): Promise<updateOrderResponse> {
   const orderReferenceId = zapReceipt.tags.find((tag) => tag[0] === 'e')![1];
+  const ticketId: string = randomBytes(16).toString('hex');
 
   // Update order to paid
   const order: Order | null = await prisma.order.update({
@@ -64,6 +66,7 @@ async function updateOrder(
       referenceId: orderReferenceId,
     },
     data: {
+      ticketId,
       paid: true,
       zapReceiptId: zapReceipt.id,
     },
@@ -84,6 +87,7 @@ async function updateOrder(
 
   const response: updateOrderResponse = {
     referenceId: orderReferenceId,
+    ticketId,
     qty: order.qty,
     totalMiliSats: order.totalMiliSats,
     zapReceiptId: order.zapReceiptId!,
@@ -122,4 +126,4 @@ async function checkInOrder(referenceId: string) {
   }
 }
 
-export { createOrder, updateOrder, getOrder, checkInOrder };
+export { createOrder, updateOrder, checkInOrder };

@@ -20,7 +20,8 @@ model User {
 
 model Order {
     id            String  @id @default(uuid())
-    referenceId   String  @unique
+    referenceId   String  @unique // for nostr event
+    ticketId      String? @unique // for check in
     qty           Int
     totalMiliSats Int
     paid          Boolean @default(false)

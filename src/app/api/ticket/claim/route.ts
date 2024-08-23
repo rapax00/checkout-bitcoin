@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
 
     // AWS SES
     try {
-      await ses.sendEmailOrder(email, updateOrderResponse.referenceId);
+      await ses.sendEmailOrder(email, updateOrderResponse.ticketId);
     } catch (error: any) {
       throw new AppError('Failed to send order email', 500);
     }
