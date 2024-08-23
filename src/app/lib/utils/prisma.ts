@@ -111,7 +111,7 @@ async function getOrder(referenceId: string): Promise<Order | null> {
   return order;
 }
 
-async function checkInOrder(ticketId: string) {
+async function checkInOrder(ticketId: string): Promise<Order> {
   const order: Order | null = await prisma.order.update({
     where: {
       ticketId,
@@ -124,6 +124,8 @@ async function checkInOrder(ticketId: string) {
   if (!order) {
     throw new Error('Error checking in order');
   }
+
+  return order;
 }
 
 export { createOrder, updateOrder, checkInOrder };

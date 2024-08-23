@@ -40,13 +40,14 @@ export async function POST(req: NextRequest) {
 
     const alreadyCheckedIn: boolean = order.checkIn;
 
+    let orderCheckIn: Order;
     if (order.paid) {
-      await checkInOrder(ticketId); // Update checkIn status if order is paid
+      orderCheckIn = await checkInOrder(ticketId); // Update checkIn status if order is paid
     }
 
     const data: CheckInResponse = {
       alreadyCheckedIn,
-      order,
+      order: order.paid ? orderCheckIn! : order,
       user: user!,
     };
 
