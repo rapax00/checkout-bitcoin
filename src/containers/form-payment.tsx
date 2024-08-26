@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { decodeInvoice } from '@lawallet/react';
 import { useEffect, useState } from 'react';
+import Loading from '@/components/animations/loading';
 
 interface FormPaymentProps {
   invoice?: string;
@@ -116,7 +117,8 @@ export function FormPayment({ invoice }: FormPaymentProps) {
                       }}
                     />
                   ) : (
-                    <Skeleton className="w-[300px] h-[300px]" />
+                    // <Skeleton className="w-[300px] h-[300px]" />
+                    <Loading />
                   )}
                 </div>
               </Card>
