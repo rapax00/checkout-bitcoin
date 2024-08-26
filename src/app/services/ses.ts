@@ -19,55 +19,114 @@ class SESClient implements SESClientInterface {
   }
 
   async sendEmailOrder(email: string, orderId: string) {
-    const html: string = `<!DOCTYPE html>
-                          <html lang="en">
-                          <head>
-                            <meta charset="UTF-8">
-                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                            <title>Orden</title>
-                            <style>
-                              body {
-                                font-family: Arial, sans-serif;
-                                background-color: #f4f4f4;
-                                color: #333333;
-                                padding: 20px;
-                              }
-                              .container {
-                                max-width: 600px;
-                                margin: 0 auto;
-                                background-color: #ffffff;
-                                padding: 20px;
-                                border-radius: 8px;
-                                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                              }
-                              h1 {
-                                color: #4CAF50;
-                              }
-                              p {
-                                font-size: 16px;
-                                line-height: 1.5;
-                              }
-                              .footer {
-                                margin-top: 20px;
-                                text-align: center;
-                                font-size: 12px;
-                                color: #777777;
-                              }
-                            </style>
-                          </head>
-                          <body>
-                            <div class="container">
-                              <h1>Tu entrada</h1>
-                              <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${orderId}" alt="QR Code">
-                              <p>ID: ${orderId}<p>
-                              <p>Saludos,<br>La Crypta</p>
-                              <div class="footer">
-                                <p>&copy; 2024 La Crypta. 2024 La Crypta. Todos los derechos reservados.</p>
-                              </div>
-                            </div>
-                          </body>
-                          </html>
-                          `;
+    const html: string = `
+    <!DOCTYPE html>
+    <html lang="es">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Confirmación de Suscripción al Boletín</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            background-color: #FFFFFF;
+            color: #333333;
+            padding: 20px;
+            margin: 0;
+          }
+
+          .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #FFFFFF;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px #C2F76C;
+            border: 1px solid #C2F76C;
+          }
+
+          .logo-container {
+            background-color: #000000;
+            max-width: auto;
+            max-height: 100px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px #C2F76C;
+            border: 1px solid #C2F76C;
+          }
+
+          .logo-container img {
+            width: 200px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+          }
+
+          h1 {
+            color: #C2F76C;
+            text-align: center;
+          }
+
+          p {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #000000;
+          }
+
+          .qr-code {
+            text-align: center;
+            margin: 20px 0;
+          }
+
+          .qr-code img {
+            background-color: #FFFFFF;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid #C2F76C;
+          }
+
+          .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #666666;
+          }
+
+          .footer a {
+            color: #C2F76C;
+            text-decoration: none;
+            margin: 0 10px;
+          }
+
+          .logo img {
+            width: 150px;
+          }
+
+          .divider {
+            border: none;
+            height: 1px;
+            background-color: #C2F76C;
+            margin: 20px 0;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="logo-container">
+            <img src='https://raw.githubusercontent.com/lacrypta/branding/5081ea1c3db1595af29eac3a2df3a9dd6aca4016/svg/new_white.svg'>
+          </div>
+          <h1>¡Gracias por suscribirte al newsletter!</h1>
+          <div class="footer">
+            <hr class="divider">
+            <p>Seguinos en nuestras redes:</p>
+            <a href="https://x.com/lacryptaok" target="_blank">X</a> | <a href="https://instagram.com/lacryptaok" target="_blank">Instagram</a> | <a href="https://lacrypta.ar" target="_blank">Web</a> | <a href="https://primal.net/p/npub1rujdpkd8mwezrvpqd2rx2zphfaztqrtsfg6w3vdnljdghs2q8qrqtt9u68" target="_blank">Nostr</a>
+            <hr class="divider">
+            <p>&copy; 2024 La Crypta. Todos los derechos reservados.</p>
+          </div>
+        </div>
+      </body>
+    </html>`;
 
     const input: SendEmailCommandInput = {
       FromEmailAddress: 'ticketing@lacrypta.ar',
@@ -78,12 +137,9 @@ class SESClient implements SESClientInterface {
       Content: {
         Simple: {
           Subject: {
-            Data: 'Esta es tu entrada para el evento',
+            Data: 'Entrada para el Cowork de La Crypta',
           },
           Body: {
-            Text: {
-              Data: 'Testo de previsualizacion?',
-            },
             Html: {
               Data: html,
             },
@@ -98,54 +154,114 @@ class SESClient implements SESClientInterface {
   }
 
   async sendEmailNewsletter(email: string) {
-    const html: string = `<!DOCTYPE html>
-                        <html lang="en">
-                        <head>
-                          <meta charset="UTF-8">
-                          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                          <title>Newsletter</title>
-                          <style>
-                            body {
-                              font-family: Arial, sans-serif;
-                              background-color: #f4f4f4;
-                              color: #333333;
-                              padding: 20px;
-                            }
-                            .container {
-                              max-width: 600px;
-                              margin: 0 auto;
-                              background-color: #ffffff;
-                              padding: 20px;
-                              border-radius: 8px;
-                              box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                            }
-                            h1 {
-                              color: #4CAF50;
-                            }
-                            p {
-                              font-size: 16px;
-                              line-height: 1.5;
-                            }
-                            .footer {
-                              margin-top: 20px;
-                              text-align: center;
-                              font-size: 12px;
-                              color: #777777;
-                            }
-                          </style>
-                        </head>
-                        <body>
-                          <div class="container">
-                            <h1>El newsletter</h1>
-                            <p>Gracias por subscribirte. 🎉<p>
-                            <p>Saludos,<br>La Crypta</p>
-                            <div class="footer">
-                              <p>&copy; 2024 La Crypta. Todos los derechos reservados.</p>
-                            </div>
-                          </div>
-                        </body>
-                        </html>
-                        `;
+    const html: string = `
+    <!DOCTYPE html>
+    <html lang="es">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Confirmación de Suscripción al Boletín</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            background-color: #FFFFFF;
+            color: #333333;
+            padding: 20px;
+            margin: 0;
+          }
+
+          .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #FFFFFF;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px #C2F76C;
+            border: 1px solid #C2F76C;
+          }
+
+          .logo-container {
+            background-color: #000000;
+            max-width: auto;
+            max-height: 100px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px #C2F76C;
+            border: 1px solid #C2F76C;
+          }
+
+          .logo-container img {
+            width: 200px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+          }
+
+          h1 {
+            color: #C2F76C;
+            text-align: center;
+          }
+
+          p {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #000000;
+          }
+
+          .qr-code {
+            text-align: center;
+            margin: 20px 0;
+          }
+
+          .qr-code img {
+            background-color: #FFFFFF;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid #C2F76C;
+          }
+
+          .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #666666;
+          }
+
+          .footer a {
+            color: #C2F76C;
+            text-decoration: none;
+            margin: 0 10px;
+          }
+
+          .logo img {
+            width: 150px;
+          }
+
+          .divider {
+            border: none;
+            height: 1px;
+            background-color: #C2F76C;
+            margin: 20px 0;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="logo-container">
+            <img src='https://raw.githubusercontent.com/lacrypta/branding/5081ea1c3db1595af29eac3a2df3a9dd6aca4016/svg/new_white.svg'>
+          </div>
+          <h1>¡Gracias por suscribirte al newsletter!</h1>
+          <div class="footer">
+            <hr class="divider">
+            <p>Seguinos en nuestras redes:</p>
+            <a href="https://x.com/lacryptaok" target="_blank">X</a> | <a href="https://instagram.com/lacryptaok" target="_blank">Instagram</a> | <a href="https://lacrypta.ar" target="_blank">Web</a> | <a href="https://primal.net/p/npub1rujdpkd8mwezrvpqd2rx2zphfaztqrtsfg6w3vdnljdghs2q8qrqtt9u68" target="_blank">Nostr</a>
+            <hr class="divider">
+            <p>&copy; 2024 La Crypta. Todos los derechos reservados.</p>
+          </div>
+        </div>
+      </body>
+    </html>`;
 
     const input: SendEmailCommandInput = {
       FromEmailAddress: 'ticketing@lacrypta.ar',

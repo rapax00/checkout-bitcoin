@@ -53,9 +53,8 @@ import { set } from 'zod';
 
 // Mock data
 const TICKET = {
-  title: 'Ticket #1',
-  description:
-    'Lorem ipsum dolor sit amet consectetur adipisicing elit. Reprehenderit impedit aperiam, optio dolores tenetur earum.',
+  title: 'Cowork de La Crypta',
+  description: 'De 10:00hs a 20:00hsm en la casa de La Crypta ',
   imageUrl: 'https://placehold.co/400',
   value: parseInt(process.env.TICKET_PRICE!),
   valueType: 'SAT',
