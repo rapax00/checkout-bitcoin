@@ -123,13 +123,15 @@ export function FormPayment({ invoice }: FormPaymentProps) {
                 </div>
               </Card>
               <div className="flex gap-2 w-full mt-2">
-                <Button
-                  variant="secondary"
-                  className="w-full"
-                  onClick={payWithWebLN}
-                >
-                  Pay with wallet
-                </Button>
+                {window.webln && (
+                  <Button
+                    variant="secondary"
+                    className="w-full"
+                    onClick={payWithWebLN}
+                  >
+                    Pay with wallet
+                  </Button>
+                )}
                 <Button className="w-full" onClick={handleCopy}>
                   Copy
                 </Button>
