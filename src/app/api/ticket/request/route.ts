@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     try {
       orderResponse = await createOrder(fullname, email, qty);
     } catch (error: any) {
-      throw new AppError(`Failed to create order. ${error.message}`, 500);
+      throw new AppError(`Failed to create order.`, 500);
     }
 
     // Sendy
