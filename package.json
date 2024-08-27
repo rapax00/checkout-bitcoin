@@ -1,8 +1,8 @@
 {
-  "name": "checkout-template",
+  "name": "simple-checkout",
   "author": {
-    "name": "Jonathan Llamas",
-    "url": "https://twitter.com/unllamas"
+    "name": "La Crypta",
+    "url": "https://github.com/lacrypta"
   },
   "version": "0.0.1",
   "private": false,
