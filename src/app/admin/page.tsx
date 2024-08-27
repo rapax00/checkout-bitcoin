@@ -19,7 +19,15 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Order, User } from '@prisma/client';
 
-const OrderDetails = ({ order, user }: { order: Order; user: User }) => (
+const OrderDetails = ({
+  order,
+  user,
+  checked,
+}: {
+  order: Order;
+  user: User;
+  checked: boolean;
+}) => (
   <div className="mt-4 space-y-2">
     <h3 className="font-semibold text-lg">Order Details</h3>
     <div className="grid grid-cols-2 gap-2 text-sm">
@@ -38,8 +46,14 @@ const OrderDetails = ({ order, user }: { order: Order; user: User }) => (
         {order.paid ? 'Paid' : 'Unpaid'}
       </Badge>
       <p className="font-medium">Check-In Status:</p>
-      <Badge variant={order.checkIn ? 'default' : 'secondary'}>
-        {order.checkIn ? 'Checked In' : 'Not Checked In'}
+      <Badge
+        variant={checked ? 'destructive' : order.paid ? 'default' : 'secondary'}
+      >
+        {checked
+          ? 'Already Checked'
+          : order.paid
+          ? 'Checked In'
+          : 'Not Checked In'}
       </Badge>
     </div>
   </div>
@@ -144,14 +158,6 @@ export default function AdminPage() {
         </div>
         {verificationStatus === 'success' && orderInfo && (
           <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-            <Alert variant="destructive">ALERTA DESTRUCTIVA</Alert>
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Error</AlertTitle>
-              <AlertDescription>
-                Your session has expired. Please log in again.
-              </AlertDescription>
-            </Alert>
             <Alert
               variant={
                 isCheckingIn
@@ -176,10 +182,10 @@ export default function AdminPage() {
                   : 'Unpaid Order'}
               </AlertTitle>
               <AlertDescription>
-                El ticket {orderInfo.ticketId}
+                El ticket
                 {orderInfo.paid
                   ? orderInfo.checkIn
-                    ? ' ya está checkeado.'
+                    ? ' ya fue checkeado.'
                     : ' es válido'
                   : ' no fue pagado.'}
               </AlertDescription>
@@ -195,7 +201,11 @@ export default function AdminPage() {
               </Button>
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <OrderDetails order={orderInfo} user={userInfo!} />
+              <OrderDetails
+                order={orderInfo}
+                user={userInfo!}
+                checked={isCheckingIn}
+              />
             </CollapsibleContent>
           </Collapsible>
         )}
