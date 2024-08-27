@@ -111,7 +111,7 @@ class SESClient implements SESClientInterface {
       <body>
         <div class="container">
           <div class="logo-container">
-            <img src='https://raw.githubusercontent.com/lacrypta/branding/5081ea1c3db1595af29eac3a2df3a9dd6aca4016/svg/new_white.svg'>
+            <img src='https://raw.githubusercontent.com/lacrypta/branding/main/iso/isologo-white.png' alt='la-crypta-logo'>
           </div>
           <h1>Tu entrada para el Cowork</h1>
           <p>Te esperamos en: <br>📍 Villanueva 1367, Belgrano, CABA. <br>⏰ A partir de las 10:00 hs. </p>
@@ -162,7 +162,7 @@ class SESClient implements SESClientInterface {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Confirmación de Suscripción al Boletín</title>
+        <title>Subscripción al Newsletter</title>
         <style>
           body {
             font-family: Arial, sans-serif;
@@ -251,7 +251,7 @@ class SESClient implements SESClientInterface {
       <body>
         <div class="container">
           <div class="logo-container">
-            <img src='https://raw.githubusercontent.com/lacrypta/branding/5081ea1c3db1595af29eac3a2df3a9dd6aca4016/svg/new_white.svg'>
+            <img src='https://raw.githubusercontent.com/lacrypta/branding/main/iso/isologo-white.png' alt='la-crypta-logo'>
           </div>
           <h1>¡Gracias por suscribirte al newsletter!</h1>
           <div class="footer">
