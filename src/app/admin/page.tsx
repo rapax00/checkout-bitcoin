@@ -46,7 +46,7 @@ const OrderDetails = ({ order, user }: { order: Order; user: User }) => (
 );
 
 export default function AdminPage() {
-  const [authenticated, setAuthenticated] = useState(true); // ALWAYS FALSE
+  const [authenticated, setAuthenticated] = useState(false); // ALWAYS FALSE
   const [password, setPassword] = useState('');
   const [ticketId, setTicketId] = useState('');
   const [verificationStatus, setVerificationStatus] = useState<
