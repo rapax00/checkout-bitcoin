@@ -1,6 +1,6 @@
-import { checkInOrder } from './../../../lib/utils/prisma';
-import { AppError } from '@/app/lib/errors/appError';
-import { prisma } from '@/app/services/prismaClient';
+import { checkInOrder } from '../../../../lib/utils/prisma';
+import { AppError } from '@/lib/errors/appError';
+import { prisma } from '@/services/prismaClient';
 import { Order, User } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 

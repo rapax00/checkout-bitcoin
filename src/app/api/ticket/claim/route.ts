@@ -1,13 +1,13 @@
-import { ses } from './../../../services/ses';
-import { updateOrder, updateOrderResponse } from './../../../lib/utils/prisma';
+import { ses } from '@/services/ses';
+import { updateOrder, updateOrderResponse } from '../../../../lib/utils/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import { getPublicKey, validateEvent } from 'nostr-tools';
 import {
   claimSchema,
   validateZapReceiptEmitter,
   validateZapRequest,
-} from '@/app/lib/validation/claimSchema';
-import { AppError } from '@/app/lib/errors/appError';
+} from '@/lib/validation/claimSchema';
+import { AppError } from '@/lib/errors/appError';
 
 interface TicketClaimResponse {
   fullname: string;
