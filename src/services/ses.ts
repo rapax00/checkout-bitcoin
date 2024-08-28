@@ -3,7 +3,7 @@ import {
   SendEmailCommand,
   SendEmailCommandInput,
 } from '@aws-sdk/client-sesv2';
-import { SESClientInterface } from '../types/ses';
+import { SESClientInterface } from '../../types/ses';
 
 class SESClient implements SESClientInterface {
   private client: SESv2Client;
