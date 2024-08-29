@@ -47,8 +47,8 @@ import { PlusIcon } from '@/components/icons/PlusIcon';
 import { MinusIcon } from '@/components/icons/MinusIcon';
 
 import useOrder from '@/hooks/useOrder';
-import { convertEvent } from './lib/utils/nostr';
-import { calculateTicketPrice } from './lib/utils/price';
+import { convertEvent } from '../lib/utils/nostr';
+import { calculateTicketPrice } from '../lib/utils/price';
 import { set } from 'zod';
 
 // Mock data
