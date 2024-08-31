@@ -6,7 +6,7 @@ const tagSchema = z.tuple([z.string(), z.string()]);
 export const contentSchema = z.object({
   limit: z.number().int(),
   checked_in: z.boolean().optional(),
-  ticket_id: z.string().optional(),
+  ticket_id: z.string().length(32).optional(),
   email: z.string().optional(),
 });
 
@@ -17,11 +17,9 @@ export const orderEventSchema = z.object({
     (data) => {
       try {
         const parsed = JSON.parse(data);
-        console.log('parsed', parsed);
-        // contentSchema.parse(parsed);
+        contentSchema.parse(parsed);
         return true;
       } catch (error: any) {
-        console.log('error', error);
         return false;
       }
     },
