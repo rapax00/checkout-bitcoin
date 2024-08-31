@@ -115,3 +115,73 @@ pnpm dev
 	}
 }
 ```
+
+## Get orders
+
+`your_ticketing_domain/api/ticket/orders`
+
+- Validate if you are an authorized admin
+
+## Parameters:
+
+> Signed Nostr Event with your admin key
+
+```json
+{
+  "id": <32-bytes lowercase hex-encoded sha256 of the serialized event data>,
+  "pubkey": <32-bytes lowercase hex-encoded public key of the event creator>,
+  "created_at": <unix timestamp in seconds>,
+  "kind": 27242,
+  "tags": [],
+  "content": <string>,
+  "sig":  <64-bytes lowercase hex of the signature of the sha256 hash of the serialized event data>
+}
+```
+
+Content:
+
+```json
+{
+  "limit": <number, 0 for all or specify te quantity>,
+  "checked_in": <boolean, optional, not passed means both>
+  "ticket_id": <string, optional, not passed means all orders>
+  "email":  <string, optional, not passed means all orders>
+}
+```
+
+> You can combine that you prefer. ei. all orders checked in of X email, only order with X ticket ID.
+
+## Response:
+
+### Valid
+
+Data is an array of objects with order information.
+
+```json
+{
+	"status": <boolean>,
+	"data": [
+		{
+			"user": {
+				"fullname": <string>,
+				"email": <string>
+			},
+			"ticketId": <string>,
+			"qty": <number>,
+			"totalMiliSats": <number>,
+			"paid": <boolean>,
+			"checkIn": <boolean>
+		},
+		...
+	]
+}
+```
+
+### Invalid
+
+```json
+{
+	"status": <boolean>,
+	"errors": <string>
+}
+```
