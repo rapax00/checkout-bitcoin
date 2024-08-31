@@ -46,7 +46,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate zapRequest
-    const publicKey = getPublicKey(process.env.SIGNER_KEY!);
+    const publicKey = getPublicKey(
+      Uint8Array.from(Buffer.from(process.env.SIGNER_KEY!, 'hex'))
+    );
     const isValidZapRequest = validateZapRequest(zapReceipt, publicKey);
     if (!isValidZapRequest) {
       throw new AppError('Invalid zapRequest', 403);
