@@ -46,7 +46,7 @@ pnpm dev
 - Create a new ticket in the database
 - Add email to Sendy list (Subscribed or not to newsletter)
 
-## Parameters:
+### Parameters:
 
 ```json
 {
@@ -57,9 +57,9 @@ pnpm dev
 }
 ```
 
-## Response:
+### Response:
 
-### Valid
+#### Valid
 
 ```json
 {
@@ -73,7 +73,7 @@ pnpm dev
 }
 ```
 
-### Invalid
+#### Invalid
 
 ```json
 {
@@ -89,7 +89,7 @@ pnpm dev
 - Check if the invoice is paid
 - Update database to mark the ticket as paid
 
-## Parameters:
+### Parameters:
 
 ```json
 {
@@ -99,9 +99,9 @@ pnpm dev
 }
 ```
 
-## Response:
+### Response:
 
-### Valid
+#### Valid
 
 ```json
 {
@@ -122,7 +122,7 @@ pnpm dev
 
 - Validate if you are an authorized admin
 
-## Parameters:
+### Parameters:
 
 > Signed Nostr Event with your admin key
 
@@ -151,9 +151,9 @@ Content:
 
 > You can combine that you prefer. ei. all orders checked in of X email, only order with X ticket ID.
 
-## Response:
+### Response:
 
-### Valid
+#### Valid
 
 Data is an array of objects with order information.
 
@@ -177,7 +177,7 @@ Data is an array of objects with order information.
 }
 ```
 
-### Invalid
+#### Invalid
 
 ```json
 {
