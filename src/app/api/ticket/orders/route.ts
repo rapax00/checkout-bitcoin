@@ -12,17 +12,21 @@ export async function POST(req: NextRequest) {
       throw new AppError('Method not allowed', 405);
     }
 
-    const body = await req.json();
+    const { authEvent } = await req.json();
+
+    if (!authEvent) {
+      throw new AppError('Missing auth event', 400);
+    }
 
     // Zod
-    const result = orderEventSchema.safeParse(body);
+    const result = orderEventSchema.safeParse(authEvent);
 
     if (!result.success) {
-      throw new AppError(result.error.errors[0].message, 403);
+      throw new AppError(result.error.errors[0].message, 400);
     }
 
     // Event validation
-    const adminPublicKey = process.env.ADMIN_PUBLIC_KEY!;
+    const adminPublicKey = process.env.ADMIN_KEY!;
 
     const isValidOrderEvent = validateOrderEvent(result.data, adminPublicKey);
 
@@ -40,7 +44,6 @@ export async function POST(req: NextRequest) {
 
     const { limit, checked_in, ticket_id, email } = contentResult.data;
 
-    console.log('result.data', result.data);
     // Prisma
     const whereClause: any = {
       paid: true,
