@@ -236,7 +236,15 @@ export default function AdminPage() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <Button className="h-fit w-fit">
+            <Button
+              className="h-fit w-fit"
+              onClick={() => {
+                toast({
+                  description: 'Not implemented yet',
+                  duration: 3000,
+                });
+              }}
+            >
               <QrCode className="h-4 w-4 mr-2"></QrCode> Scan QR
             </Button>
           </div>
