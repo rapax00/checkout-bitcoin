@@ -26,7 +26,14 @@ export function FormPayment({ invoice }: FormPaymentProps) {
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
 
   useEffect(() => {
-    const invoiceExpireDate = decodeInvoice(invoice!)?.timeExpireDate;
+    const decodedInvoice = decodeInvoice(invoice!);
+
+    if (!decodedInvoice) {
+      return;
+    }
+
+    const invoiceExpireDate =
+      (decodedInvoice?.sections[4] as any).value + decodedInvoice?.expiry!;
 
     if (invoiceExpireDate) {
       const calculateTimeRemaining = () => {
