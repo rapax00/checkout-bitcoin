@@ -116,24 +116,25 @@ export default function AdminPage() {
     }
   };
 
-  const handleCheckIn = async (ticketId: string) => {
+  const handleCheckIn = useCallback(
+    async (ticketId: string) => {
     try {
-      // const unsignedAuthEvent: EventTemplate = {
-      //   kind: 27242,
-      //   tags: [] as string[][],
-      //   content: JSON.stringify({ ticketId }),
-      //   created_at: Math.round(Date.now() / 1000),
-      // };
+        const unsignedAuthEvent: EventTemplate = {
+          kind: 27241,
+          tags: [] as string[][],
+          content: JSON.stringify({ ticket_id: ticketId }),
+          created_at: Math.round(Date.now() / 1000),
+        };
 
-      // const privKey = Uint8Array.from(Buffer.from(privateKey, 'hex'));
-      // const authEvent: Event = finalizeEvent(unsignedAuthEvent, privKey);
+        const privKey = Uint8Array.from(Buffer.from(privateKey, 'hex'));
+        const authEvent: Event = finalizeEvent(unsignedAuthEvent, privKey);
 
       const response = await fetch('/api/ticket/checkin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ticketId }),
+          body: JSON.stringify({ authEvent }),
       });
 
       if (!response.ok) {
@@ -164,9 +165,14 @@ export default function AdminPage() {
         duration: 3000,
       });
     }
-  };
+    },
+    [privateKey]
+  );
 
-  const columns = React.useMemo(() => createColumns(handleCheckIn), []);
+  const columns = React.useMemo(
+    () => createColumns(handleCheckIn),
+    [handleCheckIn]
+  );
 
   const filteredOrders = orders.filter(
     (order) =>
