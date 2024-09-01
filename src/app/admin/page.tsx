@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
   Card,
   CardContent,
@@ -14,28 +14,19 @@ import { Button } from '@/components/ui/button';
 import { QrCode, Search, RefreshCcw, Blocks } from 'lucide-react';
 import * as React from 'react';
 import { DataTable } from '@/components/table/data-table';
-import { columns } from '@/components/table/columns';
+import { createColumns, OrderInfo } from '@/components/table/columns';
 import { EventTemplate, finalizeEvent, Event, getPublicKey } from 'nostr-tools';
 import { toast } from '@/hooks/use-toast';
-
-interface OrderInfo {
-  user: {
-    fullname: string;
-    email: string;
-  };
-  ticketId: string;
-  qty: number;
-  totalMiliSats: number;
-  paid: boolean;
-  checkIn: boolean;
-}
+import { ColumnDef } from '@tanstack/react-table';
 
 export default function AdminPage() {
   // Authentication
-  const [isAuthenticated, setIsAuthenticated] = useState(false); // ALWAYS FALSE
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [privateKey, setPrivateKey] = useState('');
-  // Ticket
+  // Orders
   const [orders, setOrders] = useState<OrderInfo[]>([]);
+  // Table
+  const [searchTerm, setSearchTerm] = useState('');
 
   const handleLogin = async () => {
     try {
@@ -52,7 +43,6 @@ export default function AdminPage() {
       let publicKey;
       try {
         const privKey = Uint8Array.from(Buffer.from(privateKey, 'hex'));
-
         publicKey = getPublicKey(privKey);
       } catch (error: any) {
         throw new Error('Invalid private key');
@@ -89,11 +79,6 @@ export default function AdminPage() {
     }
   };
 
-  const handleFetchOrders = () => {
-    fetchOrders();
-  };
-
-  // Fetch orders
   const fetchOrders = async () => {
     try {
       const unsignedAuthEvent: EventTemplate = {
@@ -104,7 +89,6 @@ export default function AdminPage() {
       };
 
       const privKey = Uint8Array.from(Buffer.from(privateKey, 'hex'));
-
       const authEvent: Event = finalizeEvent(unsignedAuthEvent, privKey);
 
       const response = await fetch('/api/ticket/orders', {
@@ -123,35 +107,73 @@ export default function AdminPage() {
       setOrders(data.data);
     } catch (error: any) {
       console.error('Error:', error.message);
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch orders',
+        variant: 'destructive',
+        duration: 3000,
+      });
     }
   };
 
-  // const handleVerifyAndCheckIn = async () => {
-  //   if (!ticketId.trim()) {
-  //     return;
-  //   }
+  const handleCheckIn = async (ticketId: string) => {
+    try {
+      // const unsignedAuthEvent: EventTemplate = {
+      //   kind: 27242,
+      //   tags: [] as string[][],
+      //   content: JSON.stringify({ ticketId }),
+      //   created_at: Math.round(Date.now() / 1000),
+      // };
 
-  //   try {
-  //     const response = await fetch('/api/ticket/checkin', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({ ticketId }),
-  //     });
+      // const privKey = Uint8Array.from(Buffer.from(privateKey, 'hex'));
+      // const authEvent: Event = finalizeEvent(unsignedAuthEvent, privKey);
 
-  //     if (!response.ok) {
-  //       const errorData = await response.json();
-  //       throw new Error(errorData.message || response.statusText);
-  //     }
+      const response = await fetch('/api/ticket/checkin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ticketId }),
+      });
 
-  //     const {
-  //       data: { alreadyCheckedIn, order, user },
-  //     } = await response.json();
-  //   } catch (error: any) {
-  //     console.error('Error:', error.message);
-  //   }
-  // };
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || response.statusText);
+      }
+
+      const { data } = await response.json();
+
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order.ticketId === ticketId ? { ...order, checkIn: true } : order
+        )
+      );
+
+      toast({
+        title: 'Success',
+        description: `Ticket ${ticketId} checked in successfully`,
+        variant: 'default',
+        duration: 3000,
+      });
+    } catch (error: any) {
+      console.error('Error:', error.message);
+      toast({
+        title: 'Error',
+        description: `Failed to check in ticket ${ticketId}`,
+        variant: 'destructive',
+        duration: 3000,
+      });
+    }
+  };
+
+  const columns = React.useMemo(() => createColumns(handleCheckIn), []);
+
+  const filteredOrders = orders.filter(
+    (order) =>
+      order.user.fullname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.ticketId.includes(searchTerm)
+  );
 
   if (!isAuthenticated) {
     return (
@@ -171,7 +193,7 @@ export default function AdminPage() {
               Login
             </Button>
           </div>
-          {window.webln && (
+          {typeof window !== 'undefined' && window.webln && (
             <Button
               onClick={() => {
                 toast({
@@ -195,25 +217,26 @@ export default function AdminPage() {
       <Card>
         <CardHeader>
           <CardTitle>Orders</CardTitle>
-          <CardDescription>Description</CardDescription>
+          <CardDescription>Manage and view ticket orders</CardDescription>
           <div className="flex space-x-2">
-            <Input placeholder="Search" />
-            <Button className="h-fit w-fit" onClick={() => {}}>
-              <Search className="h-4 w-4 mr-2"></Search>Search
-            </Button>
-            <Button className="h-fit w-fit" onClick={() => {}}>
+            <Input
+              placeholder="Search"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <Button className="h-fit w-fit">
               <QrCode className="h-4 w-4 mr-2"></QrCode> Scan QR
             </Button>
           </div>
-          <Button className="h-fit w-full" onClick={handleFetchOrders}>
+          <Button className="h-fit w-full" onClick={fetchOrders}>
             <RefreshCcw className="h-4 w-4 mr-2"></RefreshCcw>Refresh
           </Button>
         </CardHeader>
         <CardContent>
-          <DataTable columns={columns} data={orders}></DataTable>
+          <DataTable columns={columns} data={filteredOrders} />
         </CardContent>
         <CardFooter>
-          <p>Footer</p>
+          <p>Total Orders: {filteredOrders.length}</p>
         </CardFooter>
       </Card>
     </>
