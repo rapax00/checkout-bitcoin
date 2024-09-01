@@ -4,6 +4,16 @@ This is a simple ticket checkout system to pay with SATS.
 
 It use Lightning Network to pay tickets, NOSTR to comunication, Sendy to mailing service and SQLite to database.
 
+# Table of Contents
+
+1. [Introduction](#introduction)
+2. [Getting Started](#getting-started)
+3. [Endpoints](#endpoints)
+   - [Create a New Ticket](#create-a-new-ticket)
+   - [Claim Ticket](#claim-ticket)
+   - [Get Orders](#get-orders)
+   - [Check-In Order](#check-in-order)
+
 # Getting Started
 
 1. Copy the `.env.example` file to `.env` and fill in the required values.
