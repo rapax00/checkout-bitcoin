@@ -60,17 +60,20 @@ export const columns: ColumnDef<OrderInfo>[] = [
   },
   {
     accessorKey: 'totalMiliSats',
-    header: 'Total (mSats)',
-  },
-  {
-    accessorKey: 'paid',
-    header: 'Paid',
+    header: 'Total (sats)',
     cell: ({ row }) => (
-      <Badge variant={row.original.paid ? 'default' : 'destructive'}>
-        {row.original.paid ? 'Paid' : 'Not Paid'}
-      </Badge>
+      <span>{Math.round(row.original.totalMiliSats / 1000)}</span>
     ),
   },
+  // {
+  //   accessorKey: 'paid',
+  //   header: 'Paid',
+  //   cell: ({ row }) => (
+  //     <Badge variant={row.original.paid ? 'default' : 'destructive'}>
+  //       {row.original.paid ? 'Paid' : 'Not Paid'}
+  //     </Badge>
+  //   ),
+  // },
   {
     accessorKey: 'checkIn',
     header: ({ column }) => {
