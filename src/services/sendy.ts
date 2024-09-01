@@ -4,7 +4,7 @@ import {
   SendyUnsubscribeParams,
   SendyResponse,
   SendySubscriptionStatusParams,
-} from '../../types/sendy';
+} from '../types/sendy';
 
 class SendyClient implements SendyClientInterface {
   private apiUrl: string;
