@@ -17,7 +17,6 @@ import { DataTable } from '@/components/table/data-table';
 import { createColumns, OrderInfo } from '@/components/table/columns';
 import { EventTemplate, finalizeEvent, Event, getPublicKey } from 'nostr-tools';
 import { toast } from '@/hooks/use-toast';
-import { ColumnDef } from '@tanstack/react-table';
 
 export default function AdminPage() {
   // Authentication
@@ -81,10 +80,17 @@ export default function AdminPage() {
 
   const fetchOrders = async () => {
     try {
+      const content = {
+        limit: 0,
+        // checked_in: true,
+        // ticket_id: "example-ticket-id",
+        // email:  "example-email@domain.com",
+      };
+
       const unsignedAuthEvent: EventTemplate = {
         kind: 27242,
         tags: [] as string[][],
-        content: '{\n  "limit": 0}',
+        content: JSON.stringify(content),
         created_at: Math.round(Date.now() / 1000),
       };
 
@@ -118,7 +124,7 @@ export default function AdminPage() {
 
   const handleCheckIn = useCallback(
     async (ticketId: string) => {
-    try {
+      try {
         const unsignedAuthEvent: EventTemplate = {
           kind: 27241,
           tags: [] as string[][],
@@ -129,42 +135,42 @@ export default function AdminPage() {
         const privKey = Uint8Array.from(Buffer.from(privateKey, 'hex'));
         const authEvent: Event = finalizeEvent(unsignedAuthEvent, privKey);
 
-      const response = await fetch('/api/ticket/checkin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        const response = await fetch('/api/ticket/checkin', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify({ authEvent }),
-      });
+        });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || response.statusText);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || response.statusText);
+        }
+
+        const { data } = await response.json();
+
+        setOrders((prevOrders) =>
+          prevOrders.map((order) =>
+            order.ticketId === ticketId ? { ...order, checkIn: true } : order
+          )
+        );
+
+        toast({
+          title: 'Success',
+          description: `Ticket ${ticketId} checked in successfully`,
+          variant: 'default',
+          duration: 3000,
+        });
+      } catch (error: any) {
+        console.error('Error:', error.message);
+        toast({
+          title: 'Error',
+          description: `Failed to check in ticket ${ticketId}`,
+          variant: 'destructive',
+          duration: 3000,
+        });
       }
-
-      const { data } = await response.json();
-
-      setOrders((prevOrders) =>
-        prevOrders.map((order) =>
-          order.ticketId === ticketId ? { ...order, checkIn: true } : order
-        )
-      );
-
-      toast({
-        title: 'Success',
-        description: `Ticket ${ticketId} checked in successfully`,
-        variant: 'default',
-        duration: 3000,
-      });
-    } catch (error: any) {
-      console.error('Error:', error.message);
-      toast({
-        title: 'Error',
-        description: `Failed to check in ticket ${ticketId}`,
-        variant: 'destructive',
-        duration: 3000,
-      });
-    }
     },
     [privateKey]
   );
