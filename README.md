@@ -185,3 +185,70 @@ Data is an array of objects with order information.
 	"errors": <string>
 }
 ```
+
+## Check In Order
+
+`your_ticketing_domain/api/ticket/checkin`
+
+- Validate if you are an authorized admin
+- Check if the order is paid and check in
+
+### Parameters:
+
+> Signed Nostr Event with your admin key
+
+```json
+{
+  "id": <32-bytes lowercase hex-encoded sha256 of the serialized event data>,
+  "pubkey": <32-bytes lowercase hex-encoded public key of the event creator>,
+  "created_at": <unix timestamp in seconds>,
+  "kind": 27242,
+  "tags": [],
+  "content": <string>,
+  "sig":  <64-bytes lowercase hex of the signature of the sha256 hash of the serialized event data>
+}
+```
+
+Content:
+
+```json
+{
+  "ticket_id": <string>,
+}
+```
+
+### Response:
+
+#### Valid
+
+```json
+{
+	"status": <boolean>,
+	"data": {
+      "alreadyCheckedIn": <boolean, true if the order already checked>,
+       "order": {
+      "id": <string, UUID format,
+      "referenceId": <64-bytes lowercase hex-encoded string>,
+      "ticketId": <16-bytes lowercase hex-encoded string>",
+      "qty": <number>,
+      "totalMiliSats": <number>,
+      "paid": <boolean>,
+      "checkIn": <boolean, true if the order has been checked in>,
+      "zapReceiptId": <64-bytes lowercase hex-encoded string>,
+      "userId": <string, UUID format>
+    },
+    "user": {
+      "id": <string, UUID format>,
+      "fullname": <string>,
+      "email": <string>
+    }
+```
+
+#### Invalid
+
+```json
+{
+	"status": <boolean>,
+	"errors": <string>
+}
+```
