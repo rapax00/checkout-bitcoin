@@ -53,8 +53,8 @@ import { set } from 'zod';
 
 // Mock data
 const TICKET = {
-  title: 'Cowork de La Crypta',
-  description: 'De 10:00hs a 20:00hsm en la casa de La Crypta ',
+  title: 'Cine: "Revolución Bitcoin"',
+  description: 'A las 20hs. En La Crypta',
   imageUrl: 'https://placehold.co/400',
   value: parseInt(process.env.TICKET_PRICE!),
   valueType: 'SAT',
