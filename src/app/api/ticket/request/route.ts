@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Event } from 'nostr-tools';
-import { generateZapRequest } from '@/app/lib/utils/nostr';
-import { generateInvoice, getLnurlpFromWalias } from '@/app/services/ln';
-import { createOrder, CreateOrderResponse } from '@/app/lib/utils/prisma';
-import { ticketSchema } from '@/app/lib/validation/ticketSchema';
-import { sendy } from '@/app/services/sendy';
-import { ses } from '@/app/services/ses';
-import { AppError } from '@/app/lib/errors/appError';
+import { generateZapRequest } from '@/lib/utils/nostr';
+import { generateInvoice, getLnurlpFromWalias } from '@/services/ln';
+import { createOrder, CreateOrderResponse } from '@/lib/utils/prisma';
+import { ticketSchema } from '@/lib/validation/ticketSchema';
+import { ses } from '@/services/ses';
+import { AppError } from '@/lib/errors/appError';
+import { sendy } from '@/services/sendy';
 
 interface RequestTicketResponse {
   pr: string;
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     try {
       orderResponse = await createOrder(fullname, email, qty);
     } catch (error: any) {
-      throw new AppError(`Failed to create order. ${error.message}`, 500);
+      throw new AppError(`Failed to create order.`, 500);
     }
 
     // Sendy

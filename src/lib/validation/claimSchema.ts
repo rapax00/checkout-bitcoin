@@ -1,4 +1,4 @@
-import { Event, validateEvent } from "nostr-tools";
+import { Event, validateEvent, verifyEvent } from "nostr-tools";
 import { z } from "zod";
 
 const tagSchema = z.tuple([z.string(), z.string()]);
@@ -70,6 +70,12 @@ export function validateZapRequest(
   const isValidEvent = validateEvent(zapRequest);
 
   if (!isValidEvent) {
+    return false;
+  }
+
+  const isVerifyEvent = verifyEvent(zapEvent);
+
+  if (!isVerifyEvent) {
     return false;
   }
 

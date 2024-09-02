@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import './globals.css';
 import { LaWalletConfig } from '@lawallet/react';
 import AppWrapper from '@/components/wrapper';
+import { Toaster } from '@/components/ui/toaster';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -25,6 +26,7 @@ export default function RootLayout({
         className={cn('min-h-screen font-sans antialiased', inter.variable)}
       >
         <AppWrapper>{children}</AppWrapper>
+        <Toaster />
       </body>
     </html>
   );

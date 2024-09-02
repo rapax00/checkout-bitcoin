@@ -1,8 +1,12 @@
-import { checkInOrder } from './../../../lib/utils/prisma';
-import { AppError } from '@/app/lib/errors/appError';
-import { prisma } from '@/app/services/prismaClient';
+import {
+  checkInEventSchema,
+  validateOrderEvent,
+} from '@/lib/validation/ordersSchema';
+import { AppError } from '@/lib/errors/appError';
+import { prisma } from '@/services/prismaClient';
 import { Order, User } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
+import { checkInOrder } from '@/lib/utils/prisma';
 
 interface CheckInResponse {
   alreadyCheckedIn: boolean;
@@ -16,8 +20,34 @@ export async function POST(req: NextRequest) {
       throw new AppError('Method not allowed', 405);
     }
 
-    const { ticketId } = await req.json();
+    // Auth event
+    const { authEvent } = await req.json();
 
+    console.log('authEvent', authEvent);
+
+    if (!authEvent) {
+      throw new AppError('Missing auth event', 400);
+    }
+
+    // Zod
+    const result = checkInEventSchema.safeParse(authEvent);
+
+    if (!result.success) {
+      throw new AppError(result.error.errors[0].message, 400);
+    }
+
+    // Event validation
+    const adminPublicKey = process.env.ADMIN_KEY!;
+
+    const isValidOrderEvent = validateOrderEvent(result.data, adminPublicKey);
+
+    const { ticket_id: ticketId } = JSON.parse(result.data.content);
+
+    if (!isValidOrderEvent) {
+      throw new AppError('Invalid order event', 403);
+    }
+
+    // Check if order
     const { order, user } = await prisma.$transaction(async () => {
       const order: Order | null = await prisma.order.findUnique({
         where: {

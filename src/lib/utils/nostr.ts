@@ -1,4 +1,4 @@
-import { Event, EventTemplate, finishEvent, getPublicKey } from 'nostr-tools';
+import { Event, EventTemplate, finalizeEvent, getPublicKey } from 'nostr-tools';
 
 function generateZapRequest(
   orderId: string,
@@ -17,9 +17,11 @@ function generateZapRequest(
     created_at: Math.round(Date.now() / 1000),
   };
 
-  const privateKey = process.env.SIGNER_PRIVATE_KEY!;
+  const privateKey = Uint8Array.from(
+    Buffer.from(process.env.SIGNER_PRIVATE_KEY!, 'hex')
+  );
 
-  const zapRequest: Event = finishEvent(unsignedZapRequest, privateKey);
+  const zapRequest: Event = finalizeEvent(unsignedZapRequest, privateKey);
 
   return zapRequest;
 }
