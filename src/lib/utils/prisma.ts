@@ -1,8 +1,8 @@
-import { prisma } from '@/app/services/prismaClient';
 import { Order, User } from '@prisma/client';
 import { randomBytes } from 'crypto';
 import { calculateTicketPrice } from './price';
 import { Event } from 'nostr-tools';
+import { prisma } from '@/services/prismaClient';
 
 export interface CreateOrderResponse {
   totalMiliSats: number;
