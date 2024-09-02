@@ -25,7 +25,7 @@ class SESClient implements SESClientInterface {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Tu entrada para el Cine</title>
+        <title>Tu Entrada para el Cowork</title>
         <style>
           body {
             font-family: Arial, sans-serif;
@@ -104,19 +104,17 @@ class SESClient implements SESClientInterface {
             height: 1px;
             background-color: #C2F76C;
             margin: 20px 0;
+            /* Espacio arriba y abajo de la línea */
           }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="logo-container">
-            <img src='https://raw.githubusercontent.com/lacrypta/branding/main/iso/isologo-white.png' alt='la-crypta-logo'>
+            <img src='https://raw.githubusercontent.com/lacrypta/branding/5081ea1c3db1595af29eac3a2df3a9dd6aca4016/svg/new_white.svg'>
           </div>
-          <h1>Tu entrada para el Cine</h1>
-          <p>Te esperamos: <br>🗓️ Martes 03/09 <br>⏰ A partir de las 20:00 hs. <br>📍 Villanueva 1367, Belgrano, CABA. </p>
-          <p>
-            <strong>Revolución Bitcoin</strong> comenzará a las <strong>21hs</strong>. ¡No llegues tarde!
-          </p>
+          <h1>Tu entrada para el Cowork</h1>
+          <p>Te esperamos en: <br>📍 Villanueva 1367, Belgrano, CABA. <br>⏰ A partir de las 10:00 hs. </p>
           <div class="qr-code">
             <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${orderId}" alt="QR Code">
           </div>
