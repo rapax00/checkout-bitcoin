@@ -410,7 +410,7 @@ export default function Page() {
               </div>
             </div>
 
-            {screen === 'information' && <FormCustomer onSubmit={() => {}} />}
+            {screen === 'information' && <FormCustomer onSubmit={handleCreateOrder} />}
 
             {screen === 'payment' && <FormPayment invoice={paymentRequest} />}
 

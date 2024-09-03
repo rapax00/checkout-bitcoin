@@ -108,9 +108,8 @@ export function FormCustomer({ onSubmit }: FormCustomerProps) {
                   </div>
                 </div>
               </div>
-              <Button type="submit" disabled={true}>
-                Tickets are sold out.
-                {/* {loading ? 'Generando ticket' : 'Confirm order'} */}
+              <Button type="submit" disabled={loading}>
+                {loading ? 'Generando ticket' : 'Confirm order'}
               </Button>
             </form>
             {message && <p className="text-center text-sm mt-2">{message}</p>}
