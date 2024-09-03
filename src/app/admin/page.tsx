@@ -167,21 +167,21 @@ export default function AdminPage() {
           )
         );
 
-        if (data.alreadyCheckedIn) {
-          toast({
-            title: 'Error',
-            description: `Ticket already checked`,
-            variant: 'destructive',
-            duration: 5000,
-          });
-        } else {
-          toast({
-            title: 'Success',
-            description: `Ticket ${ticketId} checked in successfully`,
-            variant: 'default',
-            duration: 5000,
-          });
-        }
+        // if (data.alreadyCheckedIn) {
+        //   toast({
+        //     title: 'Error',
+        //     description: `Ticket already checked`,
+        //     variant: 'destructive',
+        //     duration: 5000,
+        //   });
+        // } else {
+        toast({
+          title: 'Success',
+          description: `Ticket ${ticketId} checked in successfully`,
+          variant: 'default',
+          duration: 5000,
+        });
+        // }
       } catch (error: any) {
         console.error('Error:', error.message);
         toast({
