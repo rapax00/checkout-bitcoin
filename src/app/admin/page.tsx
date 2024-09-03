@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { QrCode, Search, RefreshCcw, Blocks } from 'lucide-react';
+import { QrCode, Search, RefreshCcw, Blocks, QrCodeIcon } from 'lucide-react';
 import * as React from 'react';
 import { DataTable } from '@/components/table/data-table';
 import { createColumns, OrderInfo } from '@/components/table/columns';
@@ -198,7 +198,7 @@ export default function AdminPage() {
   const handleScan = (result: NimiqQrScanner.ScanResult) => {
     if (!result || !result.data) return;
 
-    handleCheckIn(result.data.trim());
+    setPrivateKey(result.data.trim());
 
     closeScanner();
   };
@@ -233,20 +233,50 @@ export default function AdminPage() {
               Login
             </Button>
           </div>
-          {typeof window !== 'undefined' && window.webln && (
-            <Button
-              onClick={() => {
-                toast({
-                  description: 'Not implemented yet',
-                  duration: 3000,
-                });
-              }}
-              className="w-full"
-            >
-              <Blocks className="h-4 w-4 mr-2"></Blocks>
-              Login with Extension
+          <div className="flex items-center space-x-2">
+            <Button onClick={openScanner} className="w-full">
+              <QrCodeIcon className="h-4 w-4 mr-2"></QrCodeIcon>
+              Scan QR Code
             </Button>
-          )}
+            <Dialog open={isOpenScanner} onOpenChange={closeScanner}>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Scan QR Code</DialogTitle>
+                  <DialogDescription>
+                    Position the QR code within the camera view to scan.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="mt-4">
+                  <QrScanner
+                    className="w-full h-64 bg-black"
+                    onDecode={handleScan}
+                    startOnLaunch={true}
+                    highlightScanRegion={true}
+                    highlightCodeOutline={true}
+                    constraints={{ facingMode: 'environment' }}
+                    preferredCamera={'environment'}
+                  />
+                </div>
+                <Button onClick={closeScanner} className="mt-4">
+                  Cancel
+                </Button>
+              </DialogContent>
+            </Dialog>
+            {typeof window !== 'undefined' && window.webln && (
+              <Button
+                onClick={() => {
+                  toast({
+                    description: 'Not implemented yet',
+                    duration: 3000,
+                  });
+                }}
+                className="w-full"
+              >
+                <Blocks className="h-4 w-4 mr-2"></Blocks>
+                Login with Extension
+              </Button>
+            )}
+          </div>
         </CardContent>
       </Card>
     );
