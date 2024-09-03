@@ -167,19 +167,28 @@ export default function AdminPage() {
           )
         );
 
-        toast({
-          title: 'Success',
-          description: `Ticket ${ticketId} checked in successfully`,
-          variant: 'default',
-          duration: 3000,
-        });
+        if (data.alreadyCheckedIn) {
+          toast({
+            title: 'Error',
+            description: `Ticket already checked`,
+            variant: 'destructive',
+            duration: 5000,
+          });
+        } else {
+          toast({
+            title: 'Success',
+            description: `Ticket ${ticketId} checked in successfully`,
+            variant: 'default',
+            duration: 5000,
+          });
+        }
       } catch (error: any) {
         console.error('Error:', error.message);
         toast({
           title: 'Error',
           description: `Failed to check in ticket ${ticketId}`,
           variant: 'destructive',
-          duration: 3000,
+          duration: 5000,
         });
       }
     },
@@ -195,7 +204,15 @@ export default function AdminPage() {
     setIsOpenScanner(false);
   };
 
-  const handleScan = (result: NimiqQrScanner.ScanResult) => {
+  const handleScanCheckIn = (result: NimiqQrScanner.ScanResult) => {
+    if (!result || !result.data) return;
+
+    handleCheckIn(result.data.trim());
+
+    closeScanner();
+  };
+
+  const handleScanLogin = (result: NimiqQrScanner.ScanResult) => {
     if (!result || !result.data) return;
 
     setPrivateKey(result.data.trim());
@@ -249,7 +266,7 @@ export default function AdminPage() {
                 <div className="mt-4">
                   <QrScanner
                     className="w-full h-64 bg-black"
-                    onDecode={handleScan}
+                    onDecode={handleScanLogin}
                     startOnLaunch={true}
                     highlightScanRegion={true}
                     highlightCodeOutline={true}
@@ -317,7 +334,7 @@ export default function AdminPage() {
                 <div className="mt-4">
                   <QrScanner
                     className="w-full h-64 bg-black"
-                    onDecode={handleScan}
+                    onDecode={handleScanCheckIn}
                     startOnLaunch={true}
                     highlightScanRegion={true}
                     highlightCodeOutline={true}
