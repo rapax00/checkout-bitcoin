@@ -17,6 +17,15 @@ import { DataTable } from '@/components/table/data-table';
 import { createColumns, OrderInfo } from '@/components/table/columns';
 import { EventTemplate, finalizeEvent, Event, getPublicKey } from 'nostr-tools';
 import { toast } from '@/hooks/use-toast';
+import NimiqQrScanner from 'qr-scanner';
+import QrScanner from '@/components/scanner/Scanner';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 export default function AdminPage() {
   // Authentication
@@ -26,6 +35,8 @@ export default function AdminPage() {
   const [orders, setOrders] = useState<OrderInfo[]>([]);
   // Table
   const [searchTerm, setSearchTerm] = useState('');
+  // Scanner
+  const [isOpenScanner, setIsOpenScanner] = useState(false);
 
   const handleLogin = async () => {
     try {
@@ -175,6 +186,23 @@ export default function AdminPage() {
     [privateKey]
   );
 
+  // Scanner
+  const openScanner = () => {
+    setIsOpenScanner(true);
+  };
+
+  const closeScanner = () => {
+    setIsOpenScanner(false);
+  };
+
+  const handleScan = (result: NimiqQrScanner.ScanResult) => {
+    if (!result || !result.data) return;
+
+    handleCheckIn(result.data.trim());
+
+    closeScanner();
+  };
+
   const columns = React.useMemo(
     () => createColumns(handleCheckIn),
     [handleCheckIn]
@@ -239,14 +267,39 @@ export default function AdminPage() {
             <Button
               className="h-fit w-fit"
               onClick={() => {
-                toast({
-                  description: 'Not implemented yet',
-                  duration: 3000,
-                });
+                openScanner();
+                // toast({
+                //   description: 'Not implemented yet',
+                //   duration: 3000,
+                // });
               }}
             >
               <QrCode className="h-4 w-4 mr-2"></QrCode> Scan QR
             </Button>
+            <Dialog open={isOpenScanner} onOpenChange={closeScanner}>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Scan QR Code</DialogTitle>
+                  <DialogDescription>
+                    Position the QR code within the camera view to scan.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="mt-4">
+                  <QrScanner
+                    className="w-full h-64 bg-black"
+                    onDecode={handleScan}
+                    startOnLaunch={true}
+                    highlightScanRegion={true}
+                    highlightCodeOutline={true}
+                    constraints={{ facingMode: 'environment' }}
+                    preferredCamera={'environment'}
+                  />
+                </div>
+                <Button onClick={closeScanner} className="mt-4">
+                  Cancel
+                </Button>
+              </DialogContent>
+            </Dialog>
           </div>
           <Button className="h-fit w-full" onClick={fetchOrders}>
             <RefreshCcw className="h-4 w-4 mr-2"></RefreshCcw>Refresh
