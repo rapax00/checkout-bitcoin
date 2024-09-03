@@ -101,9 +101,12 @@ dependencies:
   nostr-tools:
     specifier: npm:@lawallet/nostr-tools
     version: /@lawallet/nostr-tools@2.7.2(typescript@5.5.4)
+  qr-scanner:
+    specifier: ^1.4.2
+    version: 1.4.2
   qrcode.react:
-    specifier: ^3.1.0
-    version: 3.1.0(react@18.3.1)
+    specifier: ^4.0.1
+    version: 4.0.1(react@18.3.1)
   react:
     specifier: ^18
     version: 18.3.1
@@ -2438,6 +2441,10 @@ packages:
     resolution: {integrity: sha512-91s/n4qUPV/wg8eE9KHYW1kouTfDk2FPGjXbBMfRWP/2vg1rCXNQL1OCabwGs0XSdukuK+MwCDXE30QpSeMUhQ==}
     dependencies:
       undici-types: 6.19.8
+
+  /@types/offscreencanvas@2019.7.3:
+    resolution: {integrity: sha512-ieXiYmgSRXUDeOntE1InxjWyvEelZGP63M+cGuquuRLuIKKT1osnkXjxev9B7d1nXSug5vpunx+gNlbVxMlC9A==}
+    dev: false
 
   /@types/phoenix@1.6.5:
     resolution: {integrity: sha512-xegpDuR+z0UqG9fwHqNoy3rI7JDlvaPh2TY47Fl80oq6g+hXT+c/LEuE43X48clZ6lOfANl5WrPur9fYO1RJ/w==}
@@ -4794,8 +4801,14 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-  /qrcode.react@3.1.0(react@18.3.1):
-    resolution: {integrity: sha512-oyF+Urr3oAMUG/OiOuONL3HXM+53wvuH3mtIWQrYmsXoAq0DkvZp2RYUWFSMFtbdOpuS++9v+WAkzNVkMlNW6Q==}
+  /qr-scanner@1.4.2:
+    resolution: {integrity: sha512-kV1yQUe2FENvn59tMZW6mOVfpq9mGxGf8l6+EGaXUOd4RBOLg7tRC83OrirM5AtDvZRpdjdlXURsHreAOSPOUw==}
+    dependencies:
+      '@types/offscreencanvas': 2019.7.3
+    dev: false
+
+  /qrcode.react@4.0.1(react@18.3.1):
+    resolution: {integrity: sha512-Lpj0tPBn561WiQ3QQWXbkx8xTtB8BZkJeMZWLJIL8iaPBCoWzW1IpCeU3gY5MDqsb0+efCvEGkl9O0naP64crA==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
     dependencies:

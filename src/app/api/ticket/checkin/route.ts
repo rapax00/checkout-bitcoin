@@ -23,8 +23,6 @@ export async function POST(req: NextRequest) {
     // Auth event
     const { authEvent } = await req.json();
 
-    console.log('authEvent', authEvent);
-
     if (!authEvent) {
       throw new AppError('Missing auth event', 400);
     }
