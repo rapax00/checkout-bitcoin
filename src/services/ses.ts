@@ -141,7 +141,7 @@ class SESClient implements SESClientInterface {
       Content: {
         Simple: {
           Subject: {
-            Data: 'Entrada para el Cowork de La Crypta',
+            Data: 'Entrada para el Cine de La Crypta',
           },
           Body: {
             Html: {
