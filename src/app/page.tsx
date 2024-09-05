@@ -63,7 +63,7 @@ const TICKET = {
 export default function Page() {
   // Flow
   const [screen, setScreen] = useState<string>('information');
-  const [isLoading, setIsloading] = useState<boolean>(true);
+  const [isLoading, setIsloading] = useState<boolean>(false);
 
   // Dialog for reset invoice
   const [open, setOpen] = useState<boolean>(false);
@@ -201,18 +201,6 @@ export default function Page() {
       setScreen('summary');
     }
   }, [isPaid]);
-
-  useEffect(() => {
-    setIsloading(false);
-  }, []);
-
-  // if (isLoading) {
-  //   return (
-  //     <>
-  //       <p>Cargando...</p>
-  //     </>
-  //   );
-  // }
 
   return (
     <>
