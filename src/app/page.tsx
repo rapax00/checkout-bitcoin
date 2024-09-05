@@ -66,9 +66,9 @@ export default function Page() {
   const [isLoading, setIsloading] = useState<boolean>(false);
 
   // Dialog for reset invoice
-  const [open, setOpen] = useState<boolean>(false);
+  const [isOpen, setOpenAlert] = useState<boolean>(false);
   const [alertText, setAlertText] = useState<string>('Try again.');
-
+  open;
   // Claim invoice
   const [newEvent, setNewEvent] = useState<Event | undefined>(undefined);
   const [userData, setUserData] = useState<OrderUserData | undefined>(
@@ -120,7 +120,7 @@ export default function Page() {
         setNewEvent(undefined);
         setIsPaid(true);
       } catch (error: any) {
-        setOpen(true);
+        setOpenAlert(true);
         setAlertText(error.message);
       }
     };
@@ -154,7 +154,7 @@ export default function Page() {
 
         setUserData(data);
       } catch (error: any) {
-        setOpen(true);
+        setOpenAlert(true);
         setAlertText(error.message);
       } finally {
         setIsloading(false);
@@ -436,7 +436,7 @@ export default function Page() {
         </section>
       </div>
 
-      <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialog open={isOpen} onOpenChange={setOpenAlert}>
         <AlertDialogContent>
           <AlertDialogHeader className="items-center">
             <SleepingIcon className="w-8 h-8 color-primary" />
