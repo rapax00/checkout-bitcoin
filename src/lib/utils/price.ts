@@ -1,6 +1,6 @@
-import axios from "axios";
+import axios from 'axios';
 
-const urlYadio = "https://api.yadio.io/exrates/ARS";
+const urlYadio = 'https://api.yadio.io/exrates/ARS';
 
 async function getBtcPrice(): Promise<number> {
   return await axios.get(urlYadio).then((res) => {

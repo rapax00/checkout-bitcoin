@@ -270,7 +270,9 @@ export default function AdminPage() {
                     startOnLaunch={true}
                     highlightScanRegion={true}
                     highlightCodeOutline={true}
-                    constraints={{ facingMode: 'environment' }}
+                    constraints={{
+                      facingMode: 'environment',
+                    }}
                     preferredCamera={'environment'}
                   />
                 </div>
@@ -338,7 +340,9 @@ export default function AdminPage() {
                     startOnLaunch={true}
                     highlightScanRegion={true}
                     highlightCodeOutline={true}
-                    constraints={{ facingMode: 'environment' }}
+                    constraints={{
+                      facingMode: 'environment',
+                    }}
                     preferredCamera={'environment'}
                   />
                 </div>
@@ -349,7 +353,8 @@ export default function AdminPage() {
             </Dialog>
           </div>
           <Button className="h-fit w-full" onClick={fetchOrders}>
-            <RefreshCcw className="h-4 w-4 mr-2"></RefreshCcw>Refresh
+            <RefreshCcw className="h-4 w-4 mr-2"></RefreshCcw>
+            Refresh
           </Button>
         </CardHeader>
         <CardContent>

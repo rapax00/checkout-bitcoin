@@ -1,4 +1,4 @@
-import { Event } from "nostr-tools";
+import { Event } from 'nostr-tools';
 
 async function generateInvoice(
   callbackUrl: string,
@@ -17,8 +17,8 @@ async function generateInvoice(
 }
 
 async function getLnurlpFromWalias(walias: string): Promise<any> {
-  const name = walias.split("@")[0];
-  const domain = walias.split("@")[1];
+  const name = walias.split('@')[0];
+  const domain = walias.split('@')[1];
 
   const url = `https://${domain}/.well-known/lnurlp/${name}`;
 

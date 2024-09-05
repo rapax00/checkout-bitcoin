@@ -140,7 +140,10 @@ export default function Page() {
 
       // Create new order
       try {
-        const order = await requestNewOrder({ ...data, qty: ticketsQty });
+        const order = await requestNewOrder({
+          ...data,
+          qty: ticketsQty,
+        });
         setPaymentRequest(order.pr);
         setOrderReferenceId(order.orderReferenceId);
 

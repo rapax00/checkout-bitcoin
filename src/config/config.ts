@@ -8,6 +8,10 @@ export const config = createConfig({
     lightningDomain: 'https://lawallet.ar',
     gateway: 'https://api.lawallet.ar',
   },
-  relaysList: ['wss://relay.damus.io', 'wss://relay.hodl.ar', 'wss://relay.lawallet.ar'],
+  relaysList: [
+    'wss://relay.damus.io',
+    'wss://relay.hodl.ar',
+    'wss://relay.lawallet.ar',
+  ],
   signer,
 });
