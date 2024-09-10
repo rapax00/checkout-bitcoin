@@ -39,11 +39,12 @@ async function calculateTicketPrice(
   qty: number,
   ticketPriceArs: number
 ): Promise<number> {
-  const ticketPriceSats: number = await convertArsToMiliSats(ticketPriceArs);
+  const ticketPriceSats: number =
+    (await convertArsToMiliSats(ticketPriceArs)) / 1000;
 
-  const totalTicketPriceSats: number = qty * ticketPriceSats;
+  const totalTicketPrice: number = qty * ticketPriceSats;
 
-  return totalTicketPriceSats;
+  return totalTicketPrice;
 }
 
 export { calculateTicketPrice };
