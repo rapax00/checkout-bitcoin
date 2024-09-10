@@ -5,11 +5,12 @@ export interface OrderUserData {
 }
 
 export interface OrderRequest extends OrderUserData {
-  qty: number;
+  ticketQuantity: number;
+  totalMiliSats: number;
 }
 
 export interface Order extends OrderRequest {
   totalMiliSats: number;
   pr: string;
-  orderReferenceId: string;
+  eventReferenceId: string;
 }

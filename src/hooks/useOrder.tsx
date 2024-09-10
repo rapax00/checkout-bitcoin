@@ -4,12 +4,14 @@ import { Event } from 'nostr-tools';
 import { useLocalStorage } from 'usehooks-ts';
 
 interface UseOrderReturn {
-  ticketsQty: number;
-  orderReferenceId: string | undefined;
+  ticketQuantity: number;
+  totalSats: number;
+  eventReferenceId: string | undefined;
   paymentRequest: string | undefined;
   isPaid: boolean;
-  setTicketsQty: (qty: number) => void;
-  setOrderReferenceId: (orderReferenceId: string | undefined) => void;
+  setTicketQuantity: (qty: number) => void;
+  setTotalSats: (totalSats: number) => void;
+  setEventReferenceId: (eventReferenceId: string | undefined) => void;
   requestNewOrder: (data: OrderRequest) => Promise<Order>;
   claimOrderPayment: (
     data: OrderUserData,
@@ -21,8 +23,9 @@ interface UseOrderReturn {
 }
 
 const useOrder = (): UseOrderReturn => {
-  const [ticketsQty, setTicketsQty] = useState(1);
-  const [orderReferenceId, setOrderReferenceId] = useState<string | undefined>(
+  const [ticketQuantity, setTicketQuantity] = useState(1);
+  const [totalSats, setTotalSats] = useState<number>(0);
+  const [eventReferenceId, setEventReferenceId] = useState<string | undefined>(
     undefined
   );
   const [paymentRequest, setPaymentRequest] = useState<string | undefined>(
@@ -48,7 +51,7 @@ const useOrder = (): UseOrderReturn => {
 
         const result: { status: string; data: Order } = await response.json();
 
-        setOrderReferenceId(result.data.orderReferenceId);
+        setEventReferenceId(result.data.eventReferenceId);
         setPaymentRequest(result.data.pr);
         setIsPaid(false);
 
@@ -57,11 +60,11 @@ const useOrder = (): UseOrderReturn => {
             resolve({
               ...data,
               totalMiliSats: result.data.totalMiliSats,
-              orderReferenceId: result.data.orderReferenceId,
+              eventReferenceId: result.data.eventReferenceId,
               pr: result.data.pr,
             });
 
-            setOrderReferenceId(result.data.orderReferenceId);
+            setEventReferenceId(result.data.eventReferenceId);
             setPaymentRequest(result.data.pr);
             setIsPaid(false);
           }, 1000);
@@ -72,14 +75,14 @@ const useOrder = (): UseOrderReturn => {
         throw error;
       }
     },
-    [setIsPaid, setOrderReferenceId, setPaymentRequest]
+    [setIsPaid, setEventReferenceId, setPaymentRequest]
   );
 
   const clear = useCallback(() => {
-    setOrderReferenceId(undefined);
+    setEventReferenceId(undefined);
     setPaymentRequest(undefined);
     setIsPaid(false);
-  }, [setIsPaid, setOrderReferenceId, setPaymentRequest]);
+  }, [setIsPaid, setEventReferenceId, setPaymentRequest]);
 
   const claimOrderPayment = async (
     data: OrderUserData,
@@ -113,8 +116,8 @@ const useOrder = (): UseOrderReturn => {
           resolve({
             fullname: result.data.fullname,
             email: result.data.email,
-            orderReferenceId: result.data.orderReferenceId,
-            qty: result.data.qty,
+            eventReferenceId: result.data.eventReferenceId,
+            ticketQuantity: result.data.ticketQuantity,
             totalMiliSats: result.data.totalMiliSats,
             pr: '',
           });
@@ -128,12 +131,14 @@ const useOrder = (): UseOrderReturn => {
   };
 
   return {
-    ticketsQty,
-    orderReferenceId,
+    ticketQuantity,
+    totalSats,
+    eventReferenceId,
     paymentRequest,
     isPaid,
-    setTicketsQty,
-    setOrderReferenceId,
+    setTicketQuantity,
+    setTotalSats,
+    setEventReferenceId,
     setPaymentRequest,
     claimOrderPayment,
     requestNewOrder,

@@ -3,16 +3,9 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Order, OrderUserData } from '@/types/orders';
+import { OrderUserData } from '@/types/orders';
 
 interface FormCustomerProps {
   onSubmit: (data: OrderUserData) => void;

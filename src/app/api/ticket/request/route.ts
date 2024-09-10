@@ -3,16 +3,14 @@ import { Event } from 'nostr-tools';
 import { generateZapRequest } from '@/lib/utils/nostr';
 import { generateInvoice, getLnurlpFromWalias } from '@/services/ln';
 import { createOrder, CreateOrderResponse } from '@/lib/utils/prisma';
-import { ticketSchema } from '@/lib/validation/ticketSchema';
+import { requestOrderSchema } from '@/lib/validation/requestOrderSchema';
 import { ses } from '@/services/ses';
 import { AppError } from '@/lib/errors/appError';
 import { sendy } from '@/services/sendy';
 
 interface RequestTicketResponse {
   pr: string;
-  orderReferenceId: string;
-  qty: number;
-  totalMiliSats: number;
+  eventReferenceId: string;
 }
 
 export async function POST(req: NextRequest) {
@@ -24,18 +22,24 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
 
     // Zod
-    const result = ticketSchema.safeParse(body);
+    const result = requestOrderSchema.safeParse(body);
 
     if (!result.success) {
       throw new AppError(result.error.errors[0].message, 400);
     }
 
-    const { fullname, email, qty, newsletter } = result.data;
+    const { fullname, email, ticketQuantity, totalMiliSats, newsletter } =
+      result.data;
 
     // Prisma Create order and user (if not created before) in prisma
     let orderResponse: CreateOrderResponse;
     try {
-      orderResponse = await createOrder(fullname, email, qty);
+      orderResponse = await createOrder(
+        fullname,
+        email,
+        ticketQuantity,
+        totalMiliSats
+      );
     } catch (error: any) {
       throw new AppError(`Failed to create order.`, 500);
     }
@@ -46,7 +50,7 @@ export async function POST(req: NextRequest) {
       const sendyResponse = await sendy.subscribe({
         name: fullname,
         email,
-        listId: process.env.SENDY_LIST!,
+        listId: process.env.NEXT_SENDY_LIST_ID!,
       });
 
       if (!sendyResponse.success) {
@@ -77,8 +81,8 @@ export async function POST(req: NextRequest) {
     let zapRequest: Event;
     try {
       zapRequest = generateZapRequest(
-        orderResponse.referenceId,
-        orderResponse.totalMiliSats,
+        orderResponse.eventReferenceId,
+        totalMiliSats,
         lnurlp.nostrPubkey
       );
     } catch (error: any) {
@@ -90,7 +94,7 @@ export async function POST(req: NextRequest) {
     try {
       invoice = await generateInvoice(
         lnurlp.callback,
-        orderResponse.totalMiliSats,
+        totalMiliSats,
         zapRequest
       );
     } catch (error: any) {
@@ -100,9 +104,7 @@ export async function POST(req: NextRequest) {
     // Response
     const response: RequestTicketResponse = {
       pr: invoice,
-      orderReferenceId: orderResponse.referenceId,
-      qty,
-      totalMiliSats: orderResponse.totalMiliSats,
+      eventReferenceId: orderResponse.eventReferenceId,
     };
 
     return NextResponse.json({

@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 const tagSchema = z.tuple([z.string(), z.string()]);
 
-const descriptionSchema = z.string().refine(
+const orderDescriptionSchema = z.string().refine(
   (value) => {
     try {
       JSON.parse(value);
@@ -15,7 +15,7 @@ const descriptionSchema = z.string().refine(
   { message: 'Invalid JSON in description tag' }
 );
 
-export const claimSchema = z.object({
+export const orderClaimSchema = z.object({
   fullname: z.string().min(3, { message: 'Fullname is required' }),
   email: z.string().email({ message: 'Invalid email address' }),
   zapReceipt: z.object({
@@ -38,7 +38,7 @@ export const claimSchema = z.object({
         (tags) => {
           const descriptionTag = tags.find((tag) => tag[0] === 'description');
           return descriptionTag
-            ? descriptionSchema.safeParse(descriptionTag[1]).success
+            ? orderDescriptionSchema.safeParse(descriptionTag[1]).success
             : false;
         },
         { message: 'Description tag must contain valid JSON' }

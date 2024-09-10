@@ -1,23 +1,21 @@
 import { Event, validateEvent, verifyEvent } from 'nostr-tools';
 import { z } from 'zod';
 
-const tagSchema = z.tuple([z.string(), z.string()]);
-
-export const contentSchema = z.object({
+export const ticketsEventContentSchema = z.object({
   limit: z.number().int(),
   checked_in: z.boolean().optional(),
   ticket_id: z.string().length(32).optional(),
   email: z.string().optional(),
 });
 
-export const orderEventSchema = z.object({
+export const ticketsEventSchema = z.object({
   kind: z.literal(27242),
   tags: z.array(z.never()),
   content: z.string().refine(
     (data) => {
       try {
         const parsed = JSON.parse(data);
-        contentSchema.parse(parsed);
+        ticketsEventContentSchema.parse(parsed);
         return true;
       } catch (error: any) {
         return false;
@@ -56,7 +54,7 @@ export const checkInEventSchema = z.object({
   sig: z.string().length(128, { message: 'Invalid signature' }),
 });
 
-export function validateOrderEvent(
+export function validateTicketEvent(
   orderEvent: Event,
   adminPublicKey: string
 ): boolean {

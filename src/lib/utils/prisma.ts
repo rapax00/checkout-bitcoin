@@ -1,34 +1,33 @@
-import { Order, User } from '@prisma/client';
+import { Order, Ticket, User } from '@prisma/client';
 import { randomBytes } from 'crypto';
-import { calculateTicketPrice } from './price';
 import { Event } from 'nostr-tools';
 import { prisma } from '@/services/prismaClient';
 
 export interface CreateOrderResponse {
-  totalMiliSats: number;
-  referenceId: string;
+  eventReferenceId: string;
 }
 
-export interface updateOrderResponse {
-  referenceId: string;
-  ticketId: string;
-  qty: number;
-  totalMiliSats: number;
-  zapReceiptId: string;
-  paid: boolean;
+export interface UpdatePaidOrderResponse {
+  tickets: Ticket[];
 }
 
+export interface CheckInTicketResponse {
+  alreadyCheckedIn: boolean;
+  checkIn: boolean;
+}
+
+// Create order and user (or update), not yet create ticket
 async function createOrder(
   fullname: string,
   email: string,
-  qty: number
+  ticketQuantity: number,
+  totalMiliSats: number
 ): Promise<CreateOrderResponse> {
-  const referenceId: string = randomBytes(32).toString('hex');
-  const ticketPriceArs: number = parseInt(process.env.TICKET_PRICE_ARS!);
-  const totalMiliSats = await calculateTicketPrice(qty, ticketPriceArs);
+  const eventReferenceId: string = randomBytes(32).toString('hex');
 
-  await prisma.$transaction(async () => {
-    const user: User = await prisma.user.upsert({
+  const { order, user } = await prisma.$transaction(async () => {
+    // Create or update user
+    const user: User | null = await prisma.user.upsert({
       where: {
         email,
       },
@@ -36,46 +35,49 @@ async function createOrder(
       create: { fullname, email },
     });
 
-    const order: Order = await prisma.order.create({
+    // Create order
+    const order: Order | null = await prisma.order.create({
       data: {
-        referenceId,
-        qty,
+        eventReferenceId,
+        ticketQuantity,
         totalMiliSats,
-        userId: user.id,
       },
     });
 
-    return { totalMiliSats, referenceId };
+    return { order, user };
   });
 
+  if (!order || !user) {
+    throw new Error('Order or user not created');
+  }
+
   const response: CreateOrderResponse = {
-    totalMiliSats,
-    referenceId,
+    eventReferenceId,
   };
 
   return response;
 }
 
-async function updateOrder(
+async function updatePaidOrder(
   fullname: string,
   email: string,
   zapReceipt: Event
-): Promise<updateOrderResponse> {
-  const orderReferenceId = zapReceipt.tags.find((tag) => tag[0] === 'e')![1];
-  const ticketId: string = randomBytes(16).toString('hex');
+): Promise<UpdatePaidOrderResponse> {
+  const eventReferenceId = zapReceipt.tags.find((tag) => tag[0] === 'e')![1];
 
-  const { order, user } = await prisma.$transaction(async () => {
+  const { order, user, tickets } = await prisma.$transaction(async () => {
+    // Update order to paid
     const order: Order | null = await prisma.order.update({
       where: {
-        referenceId: orderReferenceId,
+        eventReferenceId,
       },
       data: {
-        ticketId,
         paid: true,
         zapReceiptId: zapReceipt.id,
       },
     });
 
+    // Update the user in case their name changes
     const user: User | null = await prisma.user.update({
       where: {
         email: email,
@@ -85,54 +87,89 @@ async function updateOrder(
       },
     });
 
-    return { order, user };
+    if (!order || !user) {
+      throw new Error('Order or user not found, cannot create ticket');
+    }
+
+    // Create tickets
+    let tickets: Ticket[] = [];
+
+    for (let i = 0; i < order!.ticketQuantity; i++) {
+      const ticketId: string = randomBytes(16).toString('hex');
+
+      const ticket: Ticket | null = await prisma.ticket.create({
+        data: {
+          ticketId,
+          userId: user.id,
+          orderId: order.id,
+        },
+      });
+
+      tickets.push(ticket);
+    }
+
+    return { order, user, tickets };
   });
 
-  if (!order || !user) {
-    throw new Error('Order or user not found');
+  if (!order || !user || tickets.length === 0) {
+    throw new Error('Order or user not found or ticket not created');
   }
 
-  const response: updateOrderResponse = {
-    referenceId: orderReferenceId,
-    ticketId,
-    qty: order.qty,
-    totalMiliSats: order.totalMiliSats,
-    zapReceiptId: order.zapReceiptId!,
-    paid: order.paid,
+  const response: UpdatePaidOrderResponse = {
+    tickets,
   };
 
   return response;
 }
 
-async function getOrder(referenceId: string): Promise<Order | null> {
-  const order: Order | null = await prisma.order.findUnique({
-    where: {
-      referenceId,
-    },
-  });
+async function checkInTicket(ticketId: string): Promise<CheckInTicketResponse> {
+  const { alreadyCheckedIn, checkIn } = await prisma.$transaction(
+    // To Do: optimize this query with conditional update
+    async () => {
+      // Find ticket
+      const ticket: Ticket | null = await prisma.ticket.findUnique({
+        where: {
+          ticketId,
+        },
+      });
 
-  if (!order) {
-    throw new Error('Order not found');
-  }
+      if (!ticket) {
+        throw new Error('Ticket not found');
+      }
 
-  return order;
+      // Check if ticket is already checked in
+      let alreadyCheckedIn = false;
+
+      if (ticket.checkIn) {
+        alreadyCheckedIn = true;
+
+        return { alreadyCheckedIn, checkIn: true };
+      }
+
+      // Update ticket to checked in
+      const ticketChecked: Ticket = await prisma.ticket.update({
+        where: {
+          ticketId,
+        },
+        data: {
+          checkIn: true,
+        },
+      });
+
+      if (!ticketChecked) {
+        throw new Error('Error checking in ticket');
+      }
+
+      return { alreadyCheckedIn: false, checkIn: true };
+    }
+  );
+
+  const response: CheckInTicketResponse = {
+    alreadyCheckedIn,
+    checkIn,
+  };
+
+  return response;
 }
 
-async function checkInOrder(ticketId: string): Promise<Order> {
-  const order: Order | null = await prisma.order.update({
-    where: {
-      ticketId,
-    },
-    data: {
-      checkIn: true,
-    },
-  });
-
-  if (!order) {
-    throw new Error('Error checking in order');
-  }
-
-  return order;
-}
-
-export { createOrder, updateOrder, checkInOrder };
+export { createOrder, updatePaidOrder, checkInTicket };

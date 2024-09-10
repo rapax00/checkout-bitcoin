@@ -56,7 +56,7 @@ const TICKET = {
   title: 'Cowork de La Crypta',
   description: 'De 10:00hs a 20:00hsm en la casa de La Crypta ',
   imageUrl: 'https://placehold.co/400',
-  value: parseInt(process.env.TICKET_PRICE!),
+  value: parseInt(process.env.NEXT_TICKET_PRICE_ARS!),
   valueType: 'SAT',
 };
 
@@ -68,34 +68,32 @@ export default function Page() {
   // Dialog for reset invoice
   const [isOpen, setOpenAlert] = useState<boolean>(false);
   const [alertText, setAlertText] = useState<string>('Try again.');
-  open;
   // Claim invoice
-  const [newEvent, setNewEvent] = useState<Event | undefined>(undefined);
   const [userData, setUserData] = useState<OrderUserData | undefined>(
     undefined
   );
 
-  const [ticketsValue, setTicketsValue] = useState<number>(0);
-
   // Hooks
   const {
-    orderReferenceId,
-    ticketsQty,
+    eventReferenceId,
+    ticketQuantity,
+    totalSats,
     paymentRequest,
     isPaid,
     requestNewOrder,
     claimOrderPayment,
-    setOrderReferenceId,
-    setTicketsQty,
+    setEventReferenceId,
+    setTicketQuantity,
+    setTotalSats,
     setPaymentRequest,
     setIsPaid,
     clear,
   } = useOrder();
 
   const { events } = useSubscription({
-    filters: [{ kinds: [9735], '#e': [orderReferenceId!] }],
+    filters: [{ kinds: [9735], '#e': [eventReferenceId!] }],
     options: { closeOnEose: false },
-    enabled: Boolean(orderReferenceId),
+    enabled: Boolean(eventReferenceId),
   });
 
   // Process payment
@@ -117,7 +115,6 @@ export default function Page() {
         await claimOrderPayment(userData, event);
 
         setUserData(undefined);
-        setNewEvent(undefined);
         setIsPaid(true);
       } catch (error: any) {
         setOpenAlert(true);
@@ -142,10 +139,11 @@ export default function Page() {
       try {
         const order = await requestNewOrder({
           ...data,
-          qty: ticketsQty,
+          ticketQuantity,
+          totalMiliSats: totalSats * 1000,
         });
         setPaymentRequest(order.pr);
-        setOrderReferenceId(order.orderReferenceId);
+        setEventReferenceId(order.eventReferenceId);
 
         window.scrollTo({
           top: 0,
@@ -162,39 +160,40 @@ export default function Page() {
     },
     [
       isLoading,
-      ticketsQty,
+      ticketQuantity,
+      totalSats,
       clear,
       requestNewOrder,
       setPaymentRequest,
-      setOrderReferenceId,
+      setEventReferenceId,
     ]
   );
 
   // UI Button "Back to page"
   const backToPage = useCallback(() => {
     setScreen('information');
-    setOrderReferenceId(undefined);
-    setTicketsQty(1);
+    setEventReferenceId(undefined);
+    setTicketQuantity(1);
     setPaymentRequest(undefined);
     setIsPaid(false);
-  }, [setOrderReferenceId, setTicketsQty, setPaymentRequest, setIsPaid]);
+  }, [setEventReferenceId, setTicketQuantity, setPaymentRequest, setIsPaid]);
 
   // Calculate ticket price
   useEffect(() => {
     const calculateValue = async () => {
       try {
         const total = Math.round(
-          (await calculateTicketPrice(ticketsQty, TICKET.value)) / 1000
+          await calculateTicketPrice(ticketQuantity, TICKET.value)
         );
 
-        setTicketsValue(total);
+        setTotalSats(total);
       } catch (error: any) {
         console.error('Error calculating ticket price:', error);
       }
     };
 
     calculateValue();
-  }, [ticketsQty]);
+  }, [ticketQuantity]);
 
   useEffect(() => {
     if (isPaid) {
@@ -227,13 +226,15 @@ export default function Page() {
                     <div className="flex gap-2 items-center">
                       <Button
                         variant={
-                          screen !== 'information' || ticketsQty === 1
+                          screen !== 'information' || ticketQuantity === 1
                             ? 'ghost'
                             : 'secondary'
                         }
                         size="icon"
-                        onClick={() => setTicketsQty(ticketsQty - 1)}
-                        disabled={screen !== 'information' || ticketsQty === 1}
+                        onClick={() => setTicketQuantity(ticketQuantity - 1)}
+                        disabled={
+                          screen !== 'information' || ticketQuantity === 1
+                        }
                       >
                         <MinusIcon />
                       </Button>
@@ -243,14 +244,14 @@ export default function Page() {
                             x
                           </span>
                         )}
-                        {ticketsQty}
+                        {ticketQuantity}
                       </p>
                       <Button
                         variant={
                           screen !== 'information' ? 'ghost' : 'secondary'
                         }
                         size="icon"
-                        onClick={() => setTicketsQty(ticketsQty + 1)}
+                        onClick={() => setTicketQuantity(ticketQuantity + 1)}
                         disabled={screen !== 'information'}
                       >
                         <PlusIcon />
@@ -264,8 +265,8 @@ export default function Page() {
                   <div className="flex gap-4 justify-between items-center">
                     <p className="text-text">Total</p>
                     <p className="font-bold text-md">
-                      {ticketsValue
-                        ? ticketsValue + ' ' + TICKET.valueType
+                      {totalSats
+                        ? totalSats + ' ' + TICKET.valueType
                         : 'Calculating...'}
                     </p>
                   </div>
@@ -283,8 +284,8 @@ export default function Page() {
                       <div className="flex items-center justify-between gap-2 w-full">
                         Show order summary
                         <p className="font-bold text-lg no-underline">
-                          {ticketsValue
-                            ? ticketsValue + ' ' + TICKET.valueType
+                          {totalSats
+                            ? totalSats + ' ' + TICKET.valueType
                             : 'Calculating...'}
                         </p>
                       </div>
@@ -303,7 +304,7 @@ export default function Page() {
                               {screen !== 'information' && (
                                 <span className="font-normal text-text">x</span>
                               )}
-                              {ticketsQty}
+                              {ticketQuantity}
                             </p>
                           </div>
                         </div>
@@ -312,8 +313,8 @@ export default function Page() {
                         <div className="flex gap-4 justify-between items-center">
                           <p className="text-text text-md">Total</p>
                           <p className="font-bold text-md">
-                            {ticketsValue
-                              ? ticketsValue + ' ' + TICKET.valueType
+                            {totalSats
+                              ? totalSats + ' ' + TICKET.valueType
                               : 'Calculating...'}
                           </p>
                         </div>
@@ -336,7 +337,7 @@ export default function Page() {
                           {screen !== 'information' && (
                             <span className="font-normal text-text">x</span>
                           )}
-                          {ticketsQty}
+                          {ticketQuantity}
                         </p>
                       </div>
                     </div>
@@ -345,8 +346,8 @@ export default function Page() {
                     <div className="flex gap-4 justify-between items-center">
                       <p className="text-text">Total</p>
                       <p className="font-bold text-md">
-                        {ticketsValue
-                          ? ticketsValue + ' ' + TICKET.valueType
+                        {totalSats
+                          ? totalSats + ' ' + TICKET.valueType
                           : 'Calculating...'}
                       </p>
                     </div>

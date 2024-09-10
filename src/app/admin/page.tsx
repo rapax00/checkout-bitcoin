@@ -108,7 +108,7 @@ export default function AdminPage() {
       const privKey = Uint8Array.from(Buffer.from(privateKey, 'hex'));
       const authEvent: Event = finalizeEvent(unsignedAuthEvent, privKey);
 
-      const response = await fetch('/api/ticket/orders', {
+      const response = await fetch('/api/ticket/tickets', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

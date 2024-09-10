@@ -1,6 +1,8 @@
 import { createConfig, createSignerWithPrivateKey } from '@lawallet/react';
 
-const signer = createSignerWithPrivateKey(process.env.SIGNER_KEY || '');
+const signer = createSignerWithPrivateKey(
+  process.env.NEXT_SIGNER_PRIVATE_KEY || ''
+);
 
 export const config = createConfig({
   federationId: 'lawallet.ar',
