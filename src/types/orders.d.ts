@@ -4,13 +4,16 @@ export interface OrderUserData {
   newsletter?: boolean;
 }
 
-export interface OrderRequest extends OrderUserData {
+export interface OrderRequestData extends OrderUserData {
   ticketQuantity: number;
   totalMiliSats: number;
 }
 
-export interface Order extends OrderRequest {
-  totalMiliSats: number;
+export interface OrderRequestReturn {
   pr: string;
   eventReferenceId: string;
+}
+
+export interface OrderClaimReturn {
+  claim: boolean;
 }
