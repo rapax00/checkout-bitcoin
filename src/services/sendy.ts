@@ -157,6 +157,6 @@ class SendyClient implements SendyClientInterface {
 }
 
 export const sendy: SendyClientInterface = new SendyClient(
-  process.env.SENDY_URL!,
-  process.env.SENDY_KEY!
+  process.env.NEXT_SENDY_API_URL!,
+  process.env.NEXT_SENDY_API_KEY!
 );

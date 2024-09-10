@@ -295,6 +295,6 @@ class SESClient implements SESClientInterface {
 }
 
 export const ses: SESClientInterface = new SESClient(
-  process.env.AWS_KEY_ID!,
-  process.env.AWS_SECRET_KEY!
+  process.env.NEXT_AWS_ACCESS_KEY_ID!,
+  process.env.NEXT_AWS_SECRET_ACCESS_KEY!
 );
