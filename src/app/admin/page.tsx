@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { QrCode, Search, RefreshCcw, Blocks, QrCodeIcon } from 'lucide-react';
 import * as React from 'react';
 import { DataTable } from '@/components/table/data-table';
-import { createColumns, OrderInfo } from '@/components/table/columns';
+import { createColumns, TicketInfo } from '@/components/table/columns';
 import { EventTemplate, finalizeEvent, Event, getPublicKey } from 'nostr-tools';
 import { toast } from '@/hooks/use-toast';
 import NimiqQrScanner from 'qr-scanner';
@@ -32,7 +32,7 @@ export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [privateKey, setPrivateKey] = useState('');
   // Orders
-  const [orders, setOrders] = useState<OrderInfo[]>([]);
+  const [orders, setOrders] = useState<TicketInfo[]>([]);
   // Table
   const [searchTerm, setSearchTerm] = useState('');
   // Scanner
