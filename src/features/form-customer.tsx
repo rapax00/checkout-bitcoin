@@ -22,10 +22,8 @@ export function FormCustomer({ onSubmit }: FormCustomerProps) {
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
-    setLoading(true);
 
-    // onSubmit();
-    // return null;
+    setLoading(true);
 
     // Insert data if not exist
     const data = {

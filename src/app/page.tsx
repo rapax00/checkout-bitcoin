@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { useNostr, useSubscription, useZap } from '@lawallet/react';
+import { useSubscription, useZap } from '@lawallet/react';
 import { Event } from 'nostr-tools';
 
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import {
   Accordion,
@@ -38,7 +37,11 @@ import { cn } from '@/lib/utils';
 // Generic
 import { FormCustomer } from '../features/form-customer';
 import { FormPayment } from '../features/form-payment';
-import { Order, OrderRequest, OrderUserData } from '@/types/orders';
+import {
+  OrderRequestData,
+  OrderRequestReturn,
+  OrderUserData,
+} from '@/types/orders';
 
 // Icons
 import { SleepingIcon } from '@/components/icons/SleepingIcon';
@@ -64,68 +67,33 @@ export default function Page() {
   // Flow
   const [screen, setScreen] = useState<string>('information');
   const [isLoading, setIsloading] = useState<boolean>(false);
-
   // Dialog for reset invoice
   const [isOpen, setOpenAlert] = useState<boolean>(false);
   const [alertText, setAlertText] = useState<string>('Try again.');
-  // Claim invoice
+  // Invoice
   const [userData, setUserData] = useState<OrderUserData | undefined>(
+    undefined
+  );
+  const [totalSats, setTotalSats] = useState<number>(0);
+  const [ticketQuantity, setTicketQuantity] = useState<number>(1);
+  const [paymentRequest, setPaymentRequest] = useState<string | undefined>(
+    undefined
+  );
+  const [eventReferenceId, setEventReferenceId] = useState<string | undefined>(
     undefined
   );
 
   // Hooks
-  const {
-    eventReferenceId,
-    ticketQuantity,
-    totalSats,
-    paymentRequest,
-    isPaid,
-    requestNewOrder,
-    claimOrderPayment,
-    setEventReferenceId,
-    setTicketQuantity,
-    setTotalSats,
-    setPaymentRequest,
-    setIsPaid,
-    clear,
-  } = useOrder();
+  const { isPaid, requestNewOrder, claimOrderPayment, clear } = useOrder();
 
+  // Nostr
   const { events } = useSubscription({
     filters: [{ kinds: [9735], '#e': [eventReferenceId!] }],
     options: { closeOnEose: false },
     enabled: Boolean(eventReferenceId),
   });
 
-  // Process payment
-  useEffect(() => {
-    const processPayment = async () => {
-      try {
-        const event: Event = convertEvent(events[0]);
-
-        if (!event) {
-          console.warn('Event not defined ');
-          return;
-        }
-
-        if (!userData) {
-          console.warn('User data not defined ');
-          return;
-        }
-
-        await claimOrderPayment(userData, event);
-
-        setUserData(undefined);
-        setIsPaid(true);
-      } catch (error: any) {
-        setOpenAlert(true);
-        setAlertText(error.message);
-      }
-    };
-
-    events && events.length > 0 && processPayment();
-  }, [events]);
-
-  // UI Button "Confirm order"
+  // Reques order (UI button "Confir Order")
   const handleCreateOrder = useCallback(
     async (data: OrderUserData) => {
       if (isLoading) return;
@@ -137,11 +105,12 @@ export default function Page() {
 
       // Create new order
       try {
-        const order = await requestNewOrder({
+        const order: OrderRequestReturn = await requestNewOrder({
           ...data,
           ticketQuantity,
           totalMiliSats: totalSats * 1000,
         });
+
         setPaymentRequest(order.pr);
         setEventReferenceId(order.eventReferenceId);
 
@@ -169,14 +138,41 @@ export default function Page() {
     ]
   );
 
+  // Process payment
+  useEffect(() => {
+    const processPayment = async () => {
+      try {
+        const event: Event = convertEvent(events[0]);
+
+        if (!event) {
+          console.warn('Event not defined ');
+          return;
+        }
+
+        if (!userData) {
+          console.warn('User data not defined ');
+          return;
+        }
+
+        await claimOrderPayment(userData, event);
+
+        setUserData(undefined);
+      } catch (error: any) {
+        setOpenAlert(true);
+        setAlertText(error.message);
+      }
+    };
+
+    events && events.length > 0 && processPayment();
+  }, [events]);
+
   // UI Button "Back to page"
   const backToPage = useCallback(() => {
     setScreen('information');
     setEventReferenceId(undefined);
     setTicketQuantity(1);
     setPaymentRequest(undefined);
-    setIsPaid(false);
-  }, [setEventReferenceId, setTicketQuantity, setPaymentRequest, setIsPaid]);
+  }, [setEventReferenceId, setTicketQuantity, setPaymentRequest]);
 
   // Calculate ticket price
   useEffect(() => {
@@ -195,6 +191,7 @@ export default function Page() {
     calculateValue();
   }, [ticketQuantity]);
 
+  // Change screen when payment is confirmed
   useEffect(() => {
     if (isPaid) {
       setScreen('summary');
