@@ -62,7 +62,7 @@ export function FormCustomer({ onSubmit }: FormCustomerProps) {
                     id="fullname"
                     name="fullname"
                     minLength={3}
-                    placeholder="Satoshi Nakamoto"
+                    placeholder="Your alias"
                     required
                     onChange={(e) => setFullname(e.target.value)}
                     defaultValue={fullname}
@@ -74,7 +74,7 @@ export function FormCustomer({ onSubmit }: FormCustomerProps) {
                     type="email"
                     id="email"
                     name="email"
-                    placeholder="satoshi@gmail.com"
+                    placeholder="Your real mail"
                     required
                     onChange={(e) => setEmail(e.target.value)}
                     defaultValue={email}
