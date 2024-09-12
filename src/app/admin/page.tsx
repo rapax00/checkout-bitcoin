@@ -11,7 +11,14 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { QrCode, Search, RefreshCcw, Blocks, QrCodeIcon } from 'lucide-react';
+import {
+  QrCode,
+  RefreshCcw,
+  Blocks,
+  QrCodeIcon,
+  Ban,
+  CircleCheck,
+} from 'lucide-react';
 import * as React from 'react';
 import { DataTable } from '@/components/table/data-table';
 import { createColumns, TicketInfo } from '@/components/table/columns';
@@ -26,6 +33,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { AlertDialog } from '@radix-ui/react-alert-dialog';
+import { Alert } from '@/components/ui/alert';
+import {
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 export default function AdminPage() {
   // Authentication
@@ -37,6 +56,9 @@ export default function AdminPage() {
   const [searchTerm, setSearchTerm] = useState('');
   // Scanner
   const [isOpenScanner, setIsOpenScanner] = useState(false);
+  const [checkInResult, setCheckInResult] = useState<
+    'checkedIn' | 'alreadyCheckedIn' | 'idle'
+  >('idle');
 
   const handleLogin = async () => {
     try {
@@ -168,19 +190,23 @@ export default function AdminPage() {
         );
 
         if (data.alreadyCheckedIn) {
-          toast({
-            title: 'Error',
-            description: `Ticket already checked`,
-            variant: 'destructive',
-            duration: 5000,
-          });
+          console.log('Ticket already checked');
+          setCheckInResult('alreadyCheckedIn');
+          // toast({
+          //   title: 'Error',
+          //   description: `Ticket already checked`,
+          //   variant: 'destructive',
+          //   duration: 5000,
+          // });
         } else {
-          toast({
-            title: 'Success',
-            description: `Ticket ${ticketId} checked in successfully`,
-            variant: 'default',
-            duration: 5000,
-          });
+          console.log('Ticket checked in');
+          setCheckInResult('checkedIn');
+          // toast({
+          //   title: 'Success',
+          //   description: `Ticket ${ticketId} checked in successfully`,
+          //   variant: 'default',
+          //   duration: 5000,
+          // });
         }
       } catch (error: any) {
         console.error('Error:', error.message);
@@ -194,6 +220,10 @@ export default function AdminPage() {
     },
     [privateKey]
   );
+
+  const handleCheckInAlert = () => {
+    setCheckInResult('idle');
+  };
 
   // Scanner
   const openScanner = () => {
@@ -364,6 +394,40 @@ export default function AdminPage() {
           <p>Total Orders: {filteredOrders.length}</p>
         </CardFooter>
       </Card>
+      {/* Checked In */}
+      <AlertDialog open={checkInResult === 'checkedIn'}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex">
+              <CircleCheck className="mr-2"></CircleCheck> Success!
+            </AlertDialogTitle>
+            <AlertDialogDescription>Welcome to event!</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={handleCheckInAlert}>
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      {/* Already Checked In */}
+      <AlertDialog open={checkInResult === 'alreadyCheckedIn'}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex">
+              <Ban className="mr-2"></Ban>Failure!
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This ticket has already been checked in.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={handleCheckInAlert}>
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
