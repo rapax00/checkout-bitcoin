@@ -53,16 +53,6 @@ export async function POST(req: NextRequest) {
         listId: process.env.NEXT_SENDY_LIST_ID!,
       });
 
-      // AWS SES
-      try {
-        await ses.sendEmailNewsletter(email);
-      } catch (error: any) {
-        throw new AppError(
-          error.message || 'Failed to send email via SES',
-          500
-        );
-      }
-
       if (sendyResponse.message !== 'Already subscribed') {
         if (!sendyResponse.success) {
           throw new AppError(
