@@ -63,11 +63,23 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      if (!sendyResponse.success) {
-        throw new AppError(
-          `Subscribe to newsletter failed. ${sendyResponse.message}`,
-          404
-        );
+      if (sendyResponse.message !== 'Already subscribed') {
+        if (!sendyResponse.success) {
+          throw new AppError(
+            `Subscribe to newsletter failed. ${sendyResponse.message}`,
+            404
+          );
+        }
+
+        // AWS SES
+        try {
+          await ses.sendEmailNewsletter(email);
+        } catch (error: any) {
+          throw new AppError(
+            error.message || 'Failed to send email via SES',
+            500
+          );
+        }
       }
     }
 
