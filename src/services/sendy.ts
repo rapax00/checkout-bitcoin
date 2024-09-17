@@ -36,6 +36,18 @@ class SendyClient implements SendyClientInterface {
       return responseF;
     }
 
+    if (
+      !subscriptionStatus.success &&
+      subscriptionStatus.message !== 'Email does not exist in list'
+    ) {
+      const responseF: SendyResponse = {
+        success: false,
+        message: 'Email bounced, try with another.',
+      };
+
+      return responseF;
+    }
+
     // Create form data
     const formData = new URLSearchParams();
 
