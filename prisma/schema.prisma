@@ -17,6 +17,7 @@ model User {
     email    String @unique
 
     // Relations
+    orders  Order[]
     tickets Ticket[]
 }
 
@@ -30,7 +31,10 @@ model Order {
     zapReceiptId     String? @unique
 
     // Relations
+    userId  String
     tickets Ticket[]
+
+    User User @relation(fields: [userId], references: [id])
 }
 
 // Ticket is a single ticket for an event, only emmit when the order is paid

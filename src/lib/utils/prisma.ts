@@ -41,6 +41,7 @@ async function createOrder(
         eventReferenceId,
         ticketQuantity,
         totalMiliSats,
+        userId: user.id,
       },
     });
 
