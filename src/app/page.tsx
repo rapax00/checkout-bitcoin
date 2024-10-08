@@ -6,7 +6,13 @@ import { useSubscription, useZap } from '@lawallet/react';
 import { Event } from 'nostr-tools';
 
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -56,8 +62,8 @@ import { set } from 'zod';
 
 // Mock data
 const TICKET = {
-  title: 'Cowork de La Crypta',
-  description: 'De 10:00hs a 20:00hsm en la casa de La Crypta ',
+  title: 'Cumpleaños de La Crypta',
+  description: 'A partir de las 21hs',
   imageUrl: 'https://placehold.co/400',
   value: parseInt(process.env.NEXT_TICKET_PRICE_ARS!),
   valueType: 'SAT',
@@ -202,7 +208,7 @@ export default function Page() {
     <>
       <div className="flex flex-col md:flex-row w-full min-h-[100dvh]">
         {/* Aside info */}
-        <aside className="bg-card relative flex justify-center items-center w-full min-h-full pt-[60px] md:pt-0">
+        <aside className="bg-[url('../../public/background-1.jpg')] bg-cover bg-center relative flex justify-center items-center w-full min-h-full pt-[60px] md:pt-0">
           <Navbar />
           <div
             className={cn(
@@ -257,17 +263,18 @@ export default function Page() {
                   </div>
                   <p className="mt-2 text-sm text-text">{TICKET.description}</p>
                 </Card>
-
-                <div className="p-4">
-                  <div className="flex gap-4 justify-between items-center">
-                    <p className="text-text">Total</p>
-                    <p className="font-bold text-md">
-                      {totalSats
-                        ? totalSats + ' ' + TICKET.valueType
-                        : 'Calculating...'}
-                    </p>
+                <Card className="bg-background">
+                  <div className="p-4">
+                    <div className="flex gap-4 justify-between items-center">
+                      <p className="text-text">Total</p>
+                      <p className="font-bold text-md">
+                        {totalSats
+                          ? totalSats + ' ' + TICKET.valueType
+                          : 'Calculating...'}
+                      </p>
+                    </div>
                   </div>
-                </div>
+                </Card>
               </>
             ) : (
               <>
@@ -339,22 +346,23 @@ export default function Page() {
                       </div>
                     </div>
                   </Card>
-                  <div className="p-4">
-                    <div className="flex gap-4 justify-between items-center">
-                      <p className="text-text">Total</p>
-                      <p className="font-bold text-md">
-                        {totalSats
-                          ? totalSats + ' ' + TICKET.valueType
-                          : 'Calculating...'}
-                      </p>
+                  <Card className="bg-background">
+                    <div className="p-4">
+                      <div className="flex gap-4 justify-between items-center">
+                        <p className="text-text">Total</p>
+                        <p className="font-bold text-md">
+                          {totalSats
+                            ? totalSats + ' ' + TICKET.valueType
+                            : 'Calculating...'}
+                        </p>
+                      </div>
                     </div>
-                  </div>
+                  </Card>
                 </div>
               </>
             )}
           </div>
         </aside>
-
         {/* Section data */}
         <section className="relative flex flex-1 md:flex-auto w-full justify-center md:pr-4">
           <div className="flex flex-col gap-4 px-4 w-full py-4 max-w-[520px] pt-[80px]">
