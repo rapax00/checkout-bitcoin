@@ -8,9 +8,5 @@ export const requestOrderSchema = z.object({
     .int()
     .lt(10)
     .positive({ message: 'Ticket Quantity must be a number' }),
-  totalMiliSats: z
-    .number()
-    .int()
-    .positive({ message: 'Total Mili Sats must be a number' }),
   newsletter: z.boolean({ message: 'Newsletter must be a boolean' }),
 });

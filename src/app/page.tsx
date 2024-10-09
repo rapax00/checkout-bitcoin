@@ -114,7 +114,6 @@ export default function Page() {
         const order: OrderRequestReturn = await requestNewOrder({
           ...data,
           ticketQuantity,
-          totalMiliSats: totalSats * 1000,
         });
 
         setPaymentRequest(order.pr);
@@ -136,7 +135,6 @@ export default function Page() {
     [
       isLoading,
       ticketQuantity,
-      totalSats,
       clear,
       requestNewOrder,
       setPaymentRequest,

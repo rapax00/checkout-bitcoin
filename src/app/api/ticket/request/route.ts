@@ -7,6 +7,7 @@ import { requestOrderSchema } from '@/lib/validation/requestOrderSchema';
 import { ses } from '@/services/ses';
 import { AppError } from '@/lib/errors/appError';
 import { sendy } from '@/services/sendy';
+import { calculateTicketPrice } from '@/lib/utils/price';
 
 interface RequestTicketResponse {
   pr: string;
@@ -28,11 +29,15 @@ export async function POST(req: NextRequest) {
       throw new AppError(result.error.errors[0].message, 400);
     }
 
-    const { fullname, email, ticketQuantity, totalMiliSats, newsletter } =
-      result.data;
+    const { fullname, email, ticketQuantity, newsletter } = result.data;
 
     // Prisma Create order and user (if not created before) in prisma
     let orderResponse: CreateOrderResponse;
+    // Calculate ticket price
+    const ticketPriceArs = parseInt(process.env.NEXT_TICKET_PRICE_ARS!);
+    const totalMiliSats =
+      (await calculateTicketPrice(ticketQuantity, ticketPriceArs)) * 1000;
+
     try {
       orderResponse = await createOrder(
         fullname,
