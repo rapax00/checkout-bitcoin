@@ -106,7 +106,6 @@ export function FormCustomer({
                       id="code"
                       name="code"
                       placeholder="Code"
-                      required
                       onChange={(e) => setCode(e.target.value)}
                     />
                     <div className="absolute inset-y-0 right-0 flex items-center pr-3">
