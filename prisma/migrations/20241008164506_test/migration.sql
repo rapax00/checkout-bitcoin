@@ -15,6 +15,7 @@ CREATE TABLE "Order" (
     "totalMiliSats" INTEGER NOT NULL,
     "paid" BOOLEAN NOT NULL DEFAULT false,
     "zapReceiptId" TEXT,
+    "userId" TEXT,
 
     CONSTRAINT "Order_pkey" PRIMARY KEY ("id")
 );
@@ -41,6 +42,9 @@ CREATE UNIQUE INDEX "Order_zapReceiptId_key" ON "Order"("zapReceiptId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Ticket_ticketId_key" ON "Ticket"("ticketId");
+
+-- AddForeignKey
+ALTER TABLE "Order" ADD CONSTRAINT "Order_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
