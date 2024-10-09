@@ -8,6 +8,7 @@ import { ses } from '@/services/ses';
 import { AppError } from '@/lib/errors/appError';
 import { sendy } from '@/services/sendy';
 import { calculateTicketPrice } from '@/lib/utils/price';
+import { getCodeDiscount } from '@/lib/utils/codes';
 
 interface RequestTicketResponse {
   pr: string;
@@ -29,12 +30,17 @@ export async function POST(req: NextRequest) {
       throw new AppError(result.error.errors[0].message, 400);
     }
 
-    const { fullname, email, ticketQuantity, newsletter } = result.data;
+    const { fullname, email, ticketQuantity, newsletter, code } = result.data;
 
     // Prisma Create order and user (if not created before) in prisma
     let orderResponse: CreateOrderResponse;
     // Calculate ticket price
-    const ticketPriceArs = parseInt(process.env.NEXT_TICKET_PRICE_ARS!);
+    const discountMultiple = code ? getCodeDiscount(code) : 1;
+    const ticketPriceArs = parseInt(
+      (parseInt(process.env.NEXT_TICKET_PRICE_ARS!) * discountMultiple).toFixed(
+        0
+      )
+    );
     const totalMiliSats =
       (await calculateTicketPrice(ticketQuantity, ticketPriceArs)) * 1000;
 

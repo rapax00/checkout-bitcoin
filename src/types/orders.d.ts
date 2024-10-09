@@ -6,6 +6,7 @@ export interface OrderUserData {
 
 export interface OrderRequestData extends OrderUserData {
   ticketQuantity: number;
+  code?: string;
 }
 
 export interface OrderRequestReturn {

@@ -1,3 +1,4 @@
+import { getCodeDiscount } from '@/lib/utils/codes';
 import { useEffect, useState } from 'react';
 
 interface UseCodeReturn {
@@ -26,14 +27,9 @@ const useCode = (): UseCodeReturn => {
     setIsLoading(true);
 
     const timeoutId = setTimeout(() => {
-      if (codeFix === 'rapax') {
-        setDiscountMultiple(0.9);
-      } else if (codeFix === 'la crypta') {
-        setDiscountMultiple(0.8);
-      } else {
-        setDiscountMultiple(1);
-      }
+      const discount = getCodeDiscount(codeFix);
 
+      setDiscountMultiple(discount);
       setIsLoading(false);
     }, 500);
 

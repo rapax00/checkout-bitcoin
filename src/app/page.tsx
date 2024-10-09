@@ -43,11 +43,7 @@ import { cn } from '@/lib/utils';
 // Generic
 import { FormCustomer } from '../features/form-customer';
 import { FormPayment } from '../features/form-payment';
-import {
-  OrderRequestData,
-  OrderRequestReturn,
-  OrderUserData,
-} from '@/types/orders';
+import { OrderRequestReturn, OrderUserData } from '@/types/orders';
 
 // Icons
 import { SleepingIcon } from '@/components/icons/SleepingIcon';
@@ -92,7 +88,12 @@ export default function Page() {
 
   // Hooks
   const { isPaid, requestNewOrder, claimOrderPayment, clear } = useOrder();
-  const { discountMultiple, isLoading: isCodeLoading, setCode } = useCode();
+  const {
+    discountMultiple,
+    code,
+    isLoading: isCodeLoading,
+    setCode,
+  } = useCode();
 
   // Nostr
   const { events } = useSubscription({
@@ -116,6 +117,7 @@ export default function Page() {
         const order: OrderRequestReturn = await requestNewOrder({
           ...data,
           ticketQuantity,
+          code,
         });
 
         setPaymentRequest(order.pr);
@@ -136,6 +138,7 @@ export default function Page() {
     },
     [
       isLoading,
+      code,
       ticketQuantity,
       clear,
       requestNewOrder,
@@ -178,7 +181,8 @@ export default function Page() {
     setEventReferenceId(undefined);
     setTicketQuantity(1);
     setPaymentRequest(undefined);
-  }, [setEventReferenceId, setTicketQuantity, setPaymentRequest]);
+    setCode('');
+  }, [setEventReferenceId, setTicketQuantity, setPaymentRequest, setCode]);
 
   // Update ticket price calculations
   useEffect(() => {
