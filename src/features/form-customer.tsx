@@ -6,12 +6,21 @@ import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { OrderUserData } from '@/types/orders';
+import { CircleCheck, CircleDashed, CircleX } from 'lucide-react';
 
 interface FormCustomerProps {
   onSubmit: (data: OrderUserData) => void;
+  discountMultiple: number;
+  isCodeLoading: boolean;
+  setCode: (code: string) => void;
 }
 
-export function FormCustomer({ onSubmit }: FormCustomerProps) {
+export function FormCustomer({
+  onSubmit,
+  discountMultiple,
+  isCodeLoading,
+  setCode,
+}: FormCustomerProps) {
   // Form
   const [fullname, setFullname] = useState<string>('');
   const [email, setEmail] = useState<string>('');
@@ -19,6 +28,7 @@ export function FormCustomer({ onSubmit }: FormCustomerProps) {
   const [message, setMessage] = useState('');
 
   const [loading, setLoading] = useState<boolean>(false);
+  const [codeStatus, setCodeStatus] = useState<string>(''); // 'valid', 'invalid', or 'loading'
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
@@ -41,6 +51,14 @@ export function FormCustomer({ onSubmit }: FormCustomerProps) {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (isCodeLoading) {
+      setCodeStatus('loading');
+    } else {
+      setCodeStatus(discountMultiple != 1 ? 'valid' : 'invalid');
+    }
+  }, [isCodeLoading, discountMultiple]);
 
   return (
     <>
@@ -79,6 +97,40 @@ export function FormCustomer({ onSubmit }: FormCustomerProps) {
                     onChange={(e) => setEmail(e.target.value)}
                     defaultValue={email}
                   />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="code">Code</Label>
+                  <div className="relative">
+                    <Input
+                      type="text"
+                      id="code"
+                      name="code"
+                      placeholder="Code"
+                      required
+                      onChange={(e) => setCode(e.target.value)}
+                    />
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                      {codeStatus !== '' && (
+                        <>
+                          {codeStatus === 'valid' && (
+                            <span className="text-green-500">
+                              <CircleCheck />
+                            </span>
+                          )}
+                          {codeStatus === 'invalid' && (
+                            <span className="text-red-500">
+                              <CircleX />
+                            </span>
+                          )}
+                          {codeStatus === 'loading' && (
+                            <span className="text-gray-500">
+                              <CircleDashed />
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </div>
                 </div>
                 <div className="items-top flex space-x-2 mt-2">
                   <Checkbox

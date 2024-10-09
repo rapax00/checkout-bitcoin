@@ -58,11 +58,11 @@ import { MinusIcon } from '@/components/icons/MinusIcon';
 import useOrder from '@/hooks/useOrder';
 import { convertEvent } from '../lib/utils/nostr';
 import { calculateTicketPrice } from '../lib/utils/price';
-import { set } from 'zod';
+import useCode from '@/hooks/useCode';
 
 // Mock data
 const TICKET = {
-  title: 'Cumpleaños de La Crypta',
+  title: 'Halloween en La Crypta',
   description: 'A partir de las 21hs',
   imageUrl: 'https://placehold.co/400',
   value: parseInt(process.env.NEXT_TICKET_PRICE_ARS!),
@@ -81,6 +81,7 @@ export default function Page() {
     undefined
   );
   const [totalSats, setTotalSats] = useState<number>(0);
+  const [ticketPriceARS, setTicketPriceARS] = useState<number>(TICKET.value);
   const [ticketQuantity, setTicketQuantity] = useState<number>(1);
   const [paymentRequest, setPaymentRequest] = useState<string | undefined>(
     undefined
@@ -91,6 +92,7 @@ export default function Page() {
 
   // Hooks
   const { isPaid, requestNewOrder, claimOrderPayment, clear } = useOrder();
+  const { discountMultiple, isLoading: isCodeLoading, setCode } = useCode();
 
   // Nostr
   const { events } = useSubscription({
@@ -178,22 +180,27 @@ export default function Page() {
     setPaymentRequest(undefined);
   }, [setEventReferenceId, setTicketQuantity, setPaymentRequest]);
 
-  // Calculate ticket price
+  // Update ticket price calculations
   useEffect(() => {
-    const calculateValue = async () => {
+    const calculatePrices = async () => {
       try {
-        const total = Math.round(
-          await calculateTicketPrice(ticketQuantity, TICKET.value)
+        // Calculate discounted price in ARS
+        const discountedPriceARS = Math.round(TICKET.value * discountMultiple);
+        setTicketPriceARS(discountedPriceARS);
+
+        // Calculate total in SATs
+        const totalSATs = Math.round(
+          await calculateTicketPrice(ticketQuantity, discountedPriceARS)
         );
 
-        setTotalSats(total);
+        setTotalSats(totalSATs);
       } catch (error: any) {
-        console.error('Error calculating ticket price:', error);
+        console.error('Error calculating ticket prices:', error);
       }
     };
 
-    calculateValue();
-  }, [ticketQuantity]);
+    calculatePrices();
+  }, [ticketQuantity, discountMultiple]);
 
   // Change screen when payment is confirmed
   useEffect(() => {
@@ -221,10 +228,17 @@ export default function Page() {
                     <div>
                       <h2 className="text-md">{TICKET.title}</h2>
                       <p className="font-semibold text-lg">
-                        {TICKET.value} {' ARS'}
+                        {ticketPriceARS} ARS
+                        {discountMultiple !== 1 && (
+                          <span className="font-semibold text-sm text-text">
+                            {' '}
+                            {((1 - discountMultiple) * 100).toFixed(0)}
+                            {'% OFF'}
+                          </span>
+                        )}
                       </p>
                     </div>
-                    <div className="flex gap-2 items-center">
+                    <div className="flex gap-2 itemscenter">
                       <Button
                         variant={
                           screen !== 'information' || ticketQuantity === 1
@@ -265,11 +279,13 @@ export default function Page() {
                   <div className="p-4">
                     <div className="flex gap-4 justify-between items-center">
                       <p className="text-text">Total</p>
-                      <p className="font-bold text-md">
-                        {totalSats
-                          ? totalSats + ' ' + TICKET.valueType
-                          : 'Calculating...'}
-                      </p>
+                      <div className="text-right">
+                        <p className="font-bold text-md">
+                          {totalSats
+                            ? `${totalSats} ${TICKET.valueType}`
+                            : 'Calculating...'}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </Card>
@@ -298,7 +314,7 @@ export default function Page() {
                           <div>
                             <h2 className="text-md">{TICKET.title}</h2>
                             <p className="font-semibold text-lg">
-                              {TICKET.value} {' ARS'}
+                              {ticketPriceARS} ARS
                             </p>
                           </div>
                           <div className="flex gap-2 items-center">
@@ -314,11 +330,13 @@ export default function Page() {
                       <div className="p-4">
                         <div className="flex gap-4 justify-between items-center">
                           <p className="text-text text-md">Total</p>
-                          <p className="font-bold text-md">
-                            {totalSats
-                              ? totalSats + ' ' + TICKET.valueType
-                              : 'Calculating...'}
-                          </p>
+                          <div className="text-right">
+                            <p className="font-bold text-md">
+                              {totalSats
+                                ? `${totalSats} ${TICKET.valueType}`
+                                : 'Calculating...'}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </AccordionContent>
@@ -331,14 +349,12 @@ export default function Page() {
                       <div>
                         <h2 className="text-md">{TICKET.title}</h2>
                         <p className="font-semibold text-lg">
-                          {TICKET.value} {' ARS'}
+                          {ticketPriceARS} ARS
                         </p>
                       </div>
                       <div className="flex gap-2 items-center">
                         <p className="flex items-center justify-center gap-1 w-[40px] font-semibold">
-                          {screen !== 'information' && (
-                            <span className="font-normal text-text">x</span>
-                          )}
+                          <span className="font-normal text-text">x</span>
                           {ticketQuantity}
                         </p>
                       </div>
@@ -348,11 +364,13 @@ export default function Page() {
                     <div className="p-4">
                       <div className="flex gap-4 justify-between items-center">
                         <p className="text-text">Total</p>
-                        <p className="font-bold text-md">
-                          {totalSats
-                            ? totalSats + ' ' + TICKET.valueType
-                            : 'Calculating...'}
-                        </p>
+                        <div className="text-right">
+                          <p className="font-bold text-md">
+                            {totalSats
+                              ? `${totalSats} ${TICKET.valueType}`
+                              : 'Calculating...'}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </Card>
@@ -406,7 +424,12 @@ export default function Page() {
             </div>
 
             {screen === 'information' && (
-              <FormCustomer onSubmit={handleCreateOrder} />
+              <FormCustomer
+                onSubmit={handleCreateOrder}
+                discountMultiple={discountMultiple}
+                isCodeLoading={isCodeLoading}
+                setCode={setCode}
+              />
             )}
 
             {screen === 'payment' && <FormPayment invoice={paymentRequest} />}
