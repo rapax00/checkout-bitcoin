@@ -305,7 +305,7 @@ export default function Page() {
                       <p className="font-semibold text-lg">
                         {ticketPriceARS} ARS
                         {discountMultiple !== 1 && (
-                          <span className="font-semibold text-sm text-text">
+                          <span className="font-semibold text-sm text-primary">
                             {' '}
                             {((1 - discountMultiple) * 100).toFixed(0)}
                             {'% OFF'}
@@ -356,9 +356,18 @@ export default function Page() {
                       <p className="text-text">Total</p>
                       <div className="text-right">
                         <p className="font-bold text-md">
-                          {totalSats
-                            ? `${totalSats} ${TICKET.valueType}`
-                            : 'Calculating...'}
+                          {totalSats ? (
+                            <>
+                              {discountMultiple !== 1 && (
+                                <span className="line-through mr-2">
+                                  {Math.round(totalSats / discountMultiple)}
+                                </span>
+                              )}
+                              {totalSats} {TICKET.valueType}
+                            </>
+                          ) : (
+                            'Calculating...'
+                          )}
                         </p>
                       </div>
                     </div>
@@ -425,6 +434,13 @@ export default function Page() {
                         <h2 className="text-md">{TICKET.title}</h2>
                         <p className="font-semibold text-lg">
                           {ticketPriceARS} ARS
+                          {discountMultiple !== 1 && (
+                            <span className="font-semibold text-sm text-primary">
+                              {' '}
+                              {((1 - discountMultiple) * 100).toFixed(0)}
+                              {'% OFF'}
+                            </span>
+                          )}
                         </p>
                       </div>
                       <div className="flex gap-2 items-center">
@@ -441,9 +457,14 @@ export default function Page() {
                         <p className="text-text">Total</p>
                         <div className="text-right">
                           <p className="font-bold text-md">
-                            {totalSats
-                              ? `${totalSats} ${TICKET.valueType}`
-                              : 'Calculating...'}
+                            <>
+                              {discountMultiple !== 1 && (
+                                <span className="line-through mr-2">
+                                  {Math.round(totalSats / discountMultiple)}
+                                </span>
+                              )}
+                              {totalSats} {TICKET.valueType}
+                            </>
                           </p>
                         </div>
                       </div>
