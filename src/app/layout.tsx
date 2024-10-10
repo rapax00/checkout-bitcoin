@@ -12,7 +12,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
   title: 'Ticketing - La Crypta',
-  description: 'Ticketing para el cumpleaños de La Crypta',
+  description: 'Ticketing para eventos de La Crypta',
 };
 
 export default function RootLayout({
