@@ -288,7 +288,7 @@ export default function Page() {
     <>
       <div className="flex flex-col md:flex-row w-full min-h-[100dvh]">
         {/* Aside info */}
-        <aside className="bg-[url('../../public/background-1.jpg')] bg-cover bg-center relative flex justify-center items-center w-full min-h-full pt-[60px] md:pt-0">
+        <aside className="bg-[url('../../public/background-3-bw.png')] bg-cover bg-[center_top_-90px] relative flex justify-center items-center w-full min-h-full pt-[60px] md:pt-0">
           <Navbar />
           <div
             className={cn(
