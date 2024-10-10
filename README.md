@@ -70,7 +70,8 @@ pnpm dev
   "email": <string>,
   "ticketQuantity": <number>,
   "totalMiliSats": <number>,
-  "newsletter": <boolean>
+  "newsletter": <boolean>,
+  "code": <string, optional, discount code>
 }
 ```
 
