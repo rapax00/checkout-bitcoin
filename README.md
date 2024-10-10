@@ -84,6 +84,7 @@ pnpm dev
 	"status": <boolean>,
 	"data": {
 		"pr": <string, invoice to pay>,
+		"verify": <string, url to verify the payment (LUD-21)>,
 		"eveventReferenceId": <64-character lowercase hex value, tag e of zap request>
 	}
 }

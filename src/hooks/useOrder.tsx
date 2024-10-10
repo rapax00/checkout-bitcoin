@@ -36,8 +36,7 @@ const useOrder = (): UseOrderReturn => {
           throw new Error(`${errorData.errors || response.statusText}`);
         }
 
-        const result: { data: { pr: string; eventReferenceId: string } } =
-          await response.json();
+        const result: { data: OrderRequestReturn } = await response.json();
 
         setIsPaid(false);
 

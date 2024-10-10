@@ -85,6 +85,7 @@ export default function Page() {
   const [eventReferenceId, setEventReferenceId] = useState<string | undefined>(
     undefined
   );
+  const [verifyUrl, setVerifyUrl] = useState<string | undefined>(undefined);
 
   // Hooks
   const { isPaid, requestNewOrder, claimOrderPayment, clear } = useOrder();
@@ -96,7 +97,7 @@ export default function Page() {
   } = useCode();
 
   // Nostr
-  const { events } = useSubscription({
+  const { events, subscription } = useSubscription({
     filters: [{ kinds: [9735], '#e': [eventReferenceId!] }],
     options: { closeOnEose: false },
     enabled: Boolean(eventReferenceId),
@@ -114,14 +115,19 @@ export default function Page() {
 
       // Create new order
       try {
-        const order: OrderRequestReturn = await requestNewOrder({
+        const { pr, eventReferenceId, verify } = await requestNewOrder({
           ...data,
           ticketQuantity,
           code,
         });
 
-        setPaymentRequest(order.pr);
-        setEventReferenceId(order.eventReferenceId);
+        setPaymentRequest(pr);
+        setEventReferenceId(eventReferenceId);
+        setVerifyUrl(verify);
+
+        if (subscription) {
+          subscription.start();
+        }
 
         window.scrollTo({
           top: 0,
@@ -140,6 +146,7 @@ export default function Page() {
       isLoading,
       code,
       ticketQuantity,
+      subscription,
       clear,
       requestNewOrder,
       setPaymentRequest,
@@ -147,33 +154,96 @@ export default function Page() {
     ]
   );
 
-  // Process payment
-  useEffect(() => {
-    const processPayment = async () => {
+  // Process payment via nostr event
+  const processPayment = useCallback(
+    async (_event: any, _userData: OrderUserData) => {
       try {
-        const event: Event = convertEvent(events[0]);
+        const event: Event = convertEvent(_event);
 
         if (!event) {
           console.warn('Event not defined ');
           return;
         }
 
-        if (!userData) {
+        if (!_userData) {
           console.warn('User data not defined ');
           return;
         }
 
-        await claimOrderPayment(userData, event);
+        await claimOrderPayment(_userData, event);
 
         setUserData(undefined);
       } catch (error: any) {
         setOpenAlert(true);
         setAlertText(error.message);
       }
+    },
+    [claimOrderPayment]
+  );
+
+  useEffect(() => {
+    events && events.length && userData && processPayment(events[0], userData);
+  }, [events, userData]);
+
+  // Process payment via LUD-21
+  const verifyPayment = useCallback(async () => {
+    try {
+      if (!verifyUrl) {
+        console.warn('Verify URL not defined');
+        return false;
+      }
+
+      const response = await fetch(verifyUrl);
+      if (!response.ok) {
+        throw new Error('Failed to fetch verify payment');
+      }
+
+      const verificationData = await response.json();
+      if (!verificationData.settled) {
+        console.warn('Payment not verified');
+        return false;
+      }
+
+      console.log('====> Payment verified, starting subscription');
+      subscription?.start();
+
+      return true;
+    } catch (error: any) {
+      setOpenAlert(true);
+      setAlertText(error.message);
+      return false;
+    }
+  }, [verifyUrl, subscription]);
+
+  // Interval to verify payment via LUD-21
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout | null = null;
+
+    const startVerificationInterval = () => {
+      if (verifyUrl && !isPaid) {
+        console.log('Setting up verification interval');
+        intervalId = setInterval(async () => {
+          const isVerified = await verifyPayment();
+          if (isVerified) {
+            console.log('====> Payment verified, clearing interval');
+            if (intervalId) {
+              clearInterval(intervalId);
+              intervalId = null;
+            }
+          }
+        }, 2000);
+      }
     };
 
-    events && events.length > 0 && processPayment();
-  }, [events]);
+    startVerificationInterval();
+
+    return () => {
+      if (intervalId) {
+        console.log('Clearing interval on cleanup');
+        clearInterval(intervalId);
+      }
+    };
+  }, [verifyUrl, isPaid, verifyPayment]);
 
   // UI Button "Back to page"
   const backToPage = useCallback(() => {
@@ -181,6 +251,7 @@ export default function Page() {
     setEventReferenceId(undefined);
     setTicketQuantity(1);
     setPaymentRequest(undefined);
+    setVerifyUrl(undefined);
     setCode('');
   }, [setEventReferenceId, setTicketQuantity, setPaymentRequest, setCode]);
 

@@ -12,6 +12,7 @@ import { getCodeDiscount } from '@/lib/utils/codes';
 
 interface RequestTicketResponse {
   pr: string;
+  verify: string;
   eventReferenceId: string;
 }
 
@@ -106,20 +107,22 @@ export async function POST(req: NextRequest) {
     }
 
     // Invoice
-    let invoice: string;
+    let pr: string;
+    let verify: string;
     try {
-      invoice = await generateInvoice(
+      ({ pr, verify } = await generateInvoice(
         lnurlp.callback,
         totalMiliSats,
         zapRequest
-      );
+      ));
     } catch (error: any) {
       throw new AppError('Failed to generate Invoice', 500);
     }
 
     // Response
     const response: RequestTicketResponse = {
-      pr: invoice,
+      pr: pr,
+      verify,
       eventReferenceId: orderResponse.eventReferenceId,
     };
 

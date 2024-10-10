@@ -11,6 +11,7 @@ export interface OrderRequestData extends OrderUserData {
 
 export interface OrderRequestReturn {
   pr: string;
+  verify: string;
   eventReferenceId: string;
 }
 
