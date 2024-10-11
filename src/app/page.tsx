@@ -58,8 +58,15 @@ import useCode from '@/hooks/useCode';
 
 // Mock data
 const TICKET = {
-  title: 'Halloween en La Crypta',
-  description: 'A partir de las 21hs',
+  title: '🎃 Halloween en La Crypta 🎃',
+  subtitle: 'Sábado 2 de Noviembre a las 22hs',
+  description: [
+    'Traslado gratis desde LaBitConf',
+    'Dos pistas de baile',
+    'Tarot y cartas',
+    'Invitados internacionales',
+    'Y muchos regalos y sorpresas',
+  ],
   imageUrl: 'https://placehold.co/400',
   value: parseInt(process.env.NEXT_TICKET_PRICE_ARS!),
   valueType: 'SAT',
@@ -299,11 +306,32 @@ export default function Page() {
             {screen === 'information' ? (
               <>
                 <Card className="p-4 bg-background">
+                  <div className="flex flex-col items-center">
+                    <CardTitle>{TICKET.title}</CardTitle>
+                    <CardTitle className="text-base mt-2">
+                      {TICKET.subtitle}
+                    </CardTitle>
+                    <CardContent>
+                      <ul className="list-disc pl-5 mt-4 text-sm">
+                        {TICKET.description.map((item, index) => (
+                          <li key={index}>{item}</li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </div>
+                </Card>
+                <Card className="p-4 bg-background mt-4">
                   <div className="flex justify-between items-center gap-4">
                     <div>
-                      <h2 className="text-md">{TICKET.title}</h2>
                       <p className="font-semibold text-lg">
-                        {ticketPriceARS} ARS
+                        <>
+                          {discountMultiple !== 1 && (
+                            <span className="line-through mr-2 text-text">
+                              {Math.round(ticketPriceARS / discountMultiple)}
+                            </span>
+                          )}
+                          {ticketPriceARS} ARS
+                        </>
                         {discountMultiple !== 1 && (
                           <span className="font-semibold text-sm text-primary">
                             {' '}
@@ -313,7 +341,7 @@ export default function Page() {
                         )}
                       </p>
                     </div>
-                    <div className="flex gap-2 itemscenter">
+                    <div className="flex gap-2 items-center">
                       <Button
                         variant={
                           screen !== 'information' || ticketQuantity === 1
@@ -348,7 +376,6 @@ export default function Page() {
                       </Button>
                     </div>
                   </div>
-                  <p className="mt-2 text-sm text-text">{TICKET.description}</p>
                 </Card>
                 <Card className="bg-background">
                   <div className="p-4">
@@ -359,7 +386,7 @@ export default function Page() {
                           {totalSats ? (
                             <>
                               {discountMultiple !== 1 && (
-                                <span className="line-through mr-2">
+                                <span className="line-through mr-2 text-text">
                                   {Math.round(totalSats / discountMultiple)}
                                 </span>
                               )}
@@ -459,7 +486,7 @@ export default function Page() {
                           <p className="font-bold text-md">
                             <>
                               {discountMultiple !== 1 && (
-                                <span className="line-through mr-2">
+                                <span className="line-through mr-2 text-text">
                                   {Math.round(totalSats / discountMultiple)}
                                 </span>
                               )}
