@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
-import { useSubscription, useZap } from '@lawallet/react';
+import { useZap } from '@lawallet/react';
 import { Event } from 'nostr-tools';
 
 import { Button } from '@/components/ui/button';
@@ -55,6 +55,7 @@ import useOrder from '@/hooks/useOrder';
 import { convertEvent } from '../lib/utils/nostr';
 import { calculateTicketPrice } from '../lib/utils/price';
 import useCode from '@/hooks/useCode';
+import { useRelay } from '@/hooks/useRelay';
 
 // Mock data
 const TICKET = {
@@ -105,11 +106,17 @@ export default function Page() {
     setCode,
   } = useCode();
 
+  // Memoize filters to prevent unnecessary re-renders
+  const filters = useMemo(
+    () => [{ kinds: [9735], '#e': [eventReferenceId!] }],
+    [eventReferenceId]
+  );
+
   // Nostr
-  const { events, subscription } = useSubscription({
-    filters: [{ kinds: [9735], '#e': [eventReferenceId!] }],
-    options: { closeOnEose: false },
-    enabled: Boolean(eventReferenceId),
+  const { events, relay } = useRelay({
+    relayUrl: 'wss://relay.lawallet.ar',
+    filters,
+    closeOnEose: false,
   });
 
   // Reques order (UI button "Confir Order")
@@ -134,10 +141,6 @@ export default function Page() {
         setEventReferenceId(eventReferenceId);
         setVerifyUrl(verify);
 
-        if (subscription) {
-          subscription.start();
-        }
-
         window.scrollTo({
           top: 0,
           behavior: 'auto',
@@ -155,7 +158,6 @@ export default function Page() {
       isLoading,
       code,
       ticketQuantity,
-      subscription,
       clear,
       requestNewOrder,
       setPaymentRequest,
@@ -194,65 +196,65 @@ export default function Page() {
     events && events.length && userData && processPayment(events[0], userData);
   }, [events, userData]);
 
-  // Process payment via LUD-21
-  const verifyPayment = useCallback(async () => {
-    try {
-      if (!verifyUrl) {
-        console.warn('Verify URL not defined');
-        return false;
-      }
+  // Process payment via LUD-21 (using with useSubscription hook form lawallet/rect)
+  // const verifyPayment = useCallback(async () => {
+  //   try {
+  //     if (!verifyUrl) {
+  //       console.warn('Verify URL not defined');
+  //       return false;
+  //     }
 
-      const response = await fetch(verifyUrl);
-      if (!response.ok) {
-        throw new Error('Failed to fetch verify payment');
-      }
+  //     const response = await fetch(verifyUrl);
+  //     if (!response.ok) {
+  //       throw new Error('Failed to fetch verify payment');
+  //     }
 
-      const verificationData = await response.json();
-      if (!verificationData.settled) {
-        console.warn('Payment not verified');
-        return false;
-      }
+  //     const verificationData = await response.json();
+  //     if (!verificationData.settled) {
+  //       console.warn('Payment not verified');
+  //       return false;
+  //     }
 
-      console.log('====> Payment verified, starting subscription');
-      subscription?.start();
+  //     console.log('====> Payment verified, starting subscription');
+  //     subscription?.start();
 
-      return true;
-    } catch (error: any) {
-      setOpenAlert(true);
-      setAlertText(error.message);
-      return false;
-    }
-  }, [verifyUrl, subscription]);
+  //     return true;
+  //   } catch (error: any) {
+  //     setOpenAlert(true);
+  //     setAlertText(error.message);
+  //     return false;
+  //   }
+  // }, [verifyUrl, subscription]);
 
-  // Interval to verify payment via LUD-21
-  useEffect(() => {
-    let intervalId: NodeJS.Timeout | null = null;
+  // Interval to verify payment via LUD-21 (using with useSubscription hook form lawallet/rect)
+  // useEffect(() => {
+  //   let intervalId: NodeJS.Timeout | null = null;
 
-    const startVerificationInterval = () => {
-      if (verifyUrl && !isPaid) {
-        console.log('Setting up verification interval');
-        intervalId = setInterval(async () => {
-          const isVerified = await verifyPayment();
-          if (isVerified) {
-            console.log('====> Payment verified, clearing interval');
-            if (intervalId) {
-              clearInterval(intervalId);
-              intervalId = null;
-            }
-          }
-        }, 2000);
-      }
-    };
+  //   const startVerificationInterval = () => {
+  //     if (verifyUrl && !isPaid) {
+  //       console.log('Setting up verification interval');
+  //       intervalId = setInterval(async () => {
+  //         const isVerified = await verifyPayment();
+  //         if (isVerified) {
+  //           console.log('====> Payment verified, clearing interval');
+  //           if (intervalId) {
+  //             clearInterval(intervalId);
+  //             intervalId = null;
+  //           }
+  //         }
+  //       }, 2000);
+  //     }
+  //   };
 
-    startVerificationInterval();
+  //   startVerificationInterval();
 
-    return () => {
-      if (intervalId) {
-        console.log('Clearing interval on cleanup');
-        clearInterval(intervalId);
-      }
-    };
-  }, [verifyUrl, isPaid, verifyPayment]);
+  //   return () => {
+  //     if (intervalId) {
+  //       console.log('Clearing interval on cleanup');
+  //       clearInterval(intervalId);
+  //     }
+  //   };
+  // }, [verifyUrl, isPaid, verifyPayment]);
 
   // UI Button "Back to page"
   const backToPage = useCallback(() => {
