@@ -15,6 +15,10 @@ export function useRelay({
   const [events, setEvents] = useState<NostrEvent[]>([]);
   const [relay, setRelay] = useState<Relay | null>(null);
 
+  const clearEvents = () => {
+    setEvents([]); // Clear the events
+  };
+
   useEffect(() => {
     if (!relayUrl || !filters) {
       console.error('Relay URL or filters not provided');
@@ -62,5 +66,5 @@ export function useRelay({
     };
   }, [relayUrl, filters, closeOnEose]);
 
-  return { events, relay };
+  return { events, relay, clearEvents };
 }
