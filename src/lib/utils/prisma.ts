@@ -200,7 +200,9 @@ async function createInvite(
           where: {
             email,
           },
-          update: {},
+          update: {
+            fullname,
+          },
           create: {
             fullname,
             email,
@@ -210,8 +212,11 @@ async function createInvite(
         console.log(user);
 
         // Create ticket for the user
+        const ticketId: string = randomBytes(16).toString('hex');
+
         const ticket: Ticket = await prisma.ticket.create({
           data: {
+            ticketId,
             userId: user.id,
             orderId: null,
           },
