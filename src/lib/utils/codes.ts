@@ -1,9 +1,6 @@
-export const codes: { [key: string]: number } = {
-  // <code>: <discount percentage>
-  rapax: 10,
-  lacrypta: 21,
-  gorila: 5,
-};
+export const codes: { [key: string]: number } = JSON.parse(
+  process.env.NEXT_DISCOUNT_CODES || '{}'
+);
 
 export function getCodeDiscount(code: string) {
   if (codes[code]) {
