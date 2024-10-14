@@ -63,6 +63,7 @@ const TICKET = {
   subtitle: 'Sábado 2 de Noviembre a las 22hs',
   description: [
     'Traslado gratis desde LaBitConf',
+    'Si venís disfrazado, ¡Te llevás de regalo un trago a elección!',
     'Dos pistas de baile',
     'Tarot y cartas',
     'Invitados internacionales',

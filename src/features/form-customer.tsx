@@ -144,9 +144,6 @@ export function FormCustomer({
                     >
                       Subscribe to the newsletter
                     </label>
-                    <p className="text-sm text-text">
-                      You agree to our Terms of Service and Privacy Policy.
-                    </p>
                   </div>
                 </div>
               </div>
