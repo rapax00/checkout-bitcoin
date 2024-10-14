@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Event } from 'nostr-tools';
+import { Event, Relay } from 'nostr-tools';
 import { generateZapRequest } from '@/lib/utils/nostr';
 import { generateInvoice, getLnurlpFromWalias } from '@/services/ln';
 import { createOrder, CreateOrderResponse } from '@/lib/utils/prisma';
@@ -9,6 +9,7 @@ import { AppError } from '@/lib/errors/appError';
 import { sendy } from '@/services/sendy';
 import { calculateTicketPrice } from '@/lib/utils/price';
 import { getCodeDiscount } from '@/lib/utils/codes';
+import { generateRelay } from '@/lib/utils/relay';
 
 interface RequestTicketResponse {
   pr: string;
@@ -125,6 +126,40 @@ export async function POST(req: NextRequest) {
       verify,
       eventReferenceId: orderResponse.eventReferenceId,
     };
+
+    // New logic to connect to relay and listen for payment events
+    const relay = await generateRelay({
+      relayUrl: 'wss://relay.lawallet.ar',
+      filters: [{ kinds: [9735], '#e': [orderResponse.eventReferenceId] }],
+      onEventCallback: async (event) => {
+        console.log('Payment confirmed and processed in backend.');
+
+        // Call the claim API to claim the payment
+        try {
+          const claimResponse = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/ticket/claim`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                fullname,
+                email,
+                zapReceipt: event, // Assuming the event contains the zap receipt
+              }),
+            }
+          );
+
+          const claimData = await claimResponse.json();
+          if (!claimData.status) {
+            console.error('Failed to claim payment:', claimData.errors);
+          }
+        } catch (error) {
+          console.error('Error calling claim API:', error);
+        }
+      },
+    });
 
     return NextResponse.json({
       status: true,
