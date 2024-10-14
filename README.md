@@ -11,10 +11,10 @@ service and SQLite to database.
 2. [Getting Started](#getting-started)
 3. [Endpoints](#endpoints)
    - [Create a new order](#create-a-new-order)
+   - [Create invite tickets](#create-invite-tickets)
    - [Claim ticket](#claim-ticket)
    - [Get tickets](#get-tickets)
    - [Check In ticket](#check-in-ticket)
-   -
 
 # Getting Started
 
@@ -114,11 +114,13 @@ pnpm dev
 
 ```json
 {
-    "authEvent": <json object, nostr event with your admin key>,
+    "authEvent": <json object>,
 }
 ```
 
 Auth Event:
+
+> Nostr Event signed with your SIGNER_PRIVATE_KEY
 
 ```json
 {
@@ -139,7 +141,7 @@ Content:
 ```json
 {
     "action": <string, "add" or "remove">,
-    "list": <array of arrays, [fullname, email]>
+    "list": <array of arrays, [[fullname, email], ...]>
 }
 ```
 
@@ -220,7 +222,15 @@ Content:
 
 ### Parameters:
 
-> Signed Nostr Event with your admin key
+```json
+{
+    "authEvent": <json object>,
+}
+```
+
+Auth Event:
+
+> Nostr Event signed with your ADMIN_PRIVATE_KEY
 
 ```json
 {
@@ -292,7 +302,15 @@ Data is an array of objects with order information.
 
 ### Parameters:
 
-> Signed Nostr Event with your admin key
+```json
+{
+    "authEvent": <json object>,
+}
+```
+
+Auth Event:
+
+> Nostr Event signed with your ADMIN_PRIVATE_KEY
 
 ```json
 {
