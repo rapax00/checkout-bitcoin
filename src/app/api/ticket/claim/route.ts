@@ -59,12 +59,14 @@ export async function POST(req: NextRequest) {
     }
 
     // AWS SES
-    try {
-      for (const ticket of updateOrderResponse.tickets) {
-        await ses.sendEmailOrder(email, ticket.ticketId!); // TODO: send one email with all tickets
+    if (!updateOrderResponse.alreadyPaid) {
+      try {
+        for (const ticket of updateOrderResponse.tickets) {
+          await ses.sendEmailOrder(email, ticket.ticketId!); // TODO: send one email with all tickets
+        }
+      } catch (error: any) {
+        throw new AppError('Failed to send order email', 500);
       }
-    } catch (error: any) {
-      throw new AppError('Failed to send order email', 500);
     }
 
     // Response

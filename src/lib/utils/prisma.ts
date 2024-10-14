@@ -9,6 +9,7 @@ export interface CreateOrderResponse {
 
 export interface UpdatePaidOrderResponse {
   tickets: Ticket[];
+  alreadyPaid: boolean;
 }
 
 export interface CheckInTicketResponse {
@@ -66,61 +67,67 @@ async function updatePaidOrder(
 ): Promise<UpdatePaidOrderResponse> {
   const eventReferenceId = zapReceipt.tags.find((tag) => tag[0] === 'e')![1];
 
-  const { order, user, tickets } = await prisma.$transaction(async () => {
-    // Update order to paid
-    const order: Order | null = await prisma.order.update({
-      where: {
-        eventReferenceId,
-      },
-      data: {
-        paid: true,
-        zapReceiptId: zapReceipt.id,
-      },
-    });
+  const { order, user, tickets, alreadyPaid } = await prisma.$transaction(
+    async () => {
+      // Check if order is already paid
+      const existingOrder = await prisma.order.findUnique({
+        where: { eventReferenceId },
+        select: { paid: true },
+      });
 
-    // Update the user in case their name changes
-    const user: User | null = await prisma.user.update({
-      where: {
-        email: email,
-      },
-      data: {
-        fullname,
-      },
-    });
+      if (existingOrder?.paid) {
+        return { order: null, user: null, tickets: [], alreadyPaid: true };
+      }
 
-    if (!order || !user) {
-      throw new Error('Order or user not found, cannot create ticket');
-    }
-
-    // Create tickets
-    let tickets: Ticket[] = [];
-
-    for (let i = 0; i < order!.ticketQuantity; i++) {
-      const ticketId: string = randomBytes(16).toString('hex');
-
-      const ticket: Ticket | null = await prisma.ticket.create({
+      // Update order to paid
+      const order: Order | null = await prisma.order.update({
+        where: { eventReferenceId },
         data: {
-          ticketId,
-          userId: user.id,
-          orderId: order.id,
+          paid: true,
+          zapReceiptId: zapReceipt.id,
         },
       });
 
-      tickets.push(ticket);
-    }
+      // Update the user in case their name changes
+      const user: User | null = await prisma.user.update({
+        where: { email },
+        data: { fullname },
+      });
 
-    return { order, user, tickets };
-  });
+      if (!order || !user) {
+        throw new Error('Order or user not found, cannot create ticket');
+      }
+
+      // Create tickets
+      let tickets: Ticket[] = [];
+
+      for (let i = 0; i < order.ticketQuantity; i++) {
+        const ticketId: string = randomBytes(16).toString('hex');
+
+        const ticket: Ticket | null = await prisma.ticket.create({
+          data: {
+            ticketId,
+            userId: user.id,
+            orderId: order.id,
+          },
+        });
+
+        tickets.push(ticket);
+      }
+
+      return { order, user, tickets, alreadyPaid: false };
+    }
+  );
+
+  if (alreadyPaid) {
+    return { tickets: [], alreadyPaid };
+  }
 
   if (!order || !user || tickets.length === 0) {
     throw new Error('Order or user not found or ticket not created');
   }
 
-  const response: UpdatePaidOrderResponse = {
-    tickets,
-  };
-
-  return response;
+  return { tickets, alreadyPaid };
 }
 
 async function checkInTicket(ticketId: string): Promise<CheckInTicketResponse> {
