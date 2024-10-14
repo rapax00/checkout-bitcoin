@@ -45,8 +45,8 @@ model Ticket {
 
     // Relations
     userId  String
-    orderId String
+    orderId String?
 
-    User  User  @relation(fields: [userId], references: [id])
-    Order Order @relation(fields: [orderId], references: [id])
+    User  User   @relation(fields: [userId], references: [id])
+    Order Order? @relation(fields: [orderId], references: [id])
 }

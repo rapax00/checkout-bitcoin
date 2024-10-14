@@ -17,6 +17,10 @@ export interface CheckInTicketResponse {
   checkIn: boolean;
 }
 
+export interface CreateInviteResponse {
+  ticketList: [string, string][];
+}
+
 // Create order and user (or update), not yet create ticket
 async function createOrder(
   fullname: string,
@@ -180,4 +184,76 @@ async function checkInTicket(ticketId: string): Promise<CheckInTicketResponse> {
   return response;
 }
 
-export { createOrder, updatePaidOrder, checkInTicket };
+// Add user to database
+async function createInvite(
+  action: string,
+  list: [string, string][]
+): Promise<CreateInviteResponse> {
+  const { ticketList } = await prisma.$transaction(async (prisma) => {
+    let ticketList: [string, string][] = [];
+
+    if (action === 'add') {
+      for (const [fullname, email] of list) {
+        console.log(fullname, email);
+        // Create user
+        const user = await prisma.user.upsert({
+          where: {
+            email,
+          },
+          update: {},
+          create: {
+            fullname,
+            email,
+          },
+        });
+
+        console.log(user);
+
+        // Create ticket for the user
+        const ticket: Ticket = await prisma.ticket.create({
+          data: {
+            userId: user.id,
+            orderId: null,
+          },
+        });
+
+        ticketList.push([user.email, ticket.ticketId!]);
+      }
+    } else if (action === 'remove') {
+      // TODO: Implement this
+      // const emails = list.map(([_, email]) => email); // Extract emails from the array
+      // // Remove users and their related tickets
+      // const ticket = await prisma.ticket.deleteMany({
+      //   where: {
+      //     User: {
+      //       email: {
+      //         in: emails,
+      //       },
+      //     },
+      //   },
+      // });
+      // tickets.push(ticket.ticketId!);
+      // await prisma.user.deleteMany({
+      //   where: {
+      //     email: {
+      //       in: emails,
+      //     },
+      //   },
+      // });
+    }
+
+    return { ticketList };
+  });
+
+  if (ticketList.length === 0) {
+    throw new Error('Failed to create invite');
+  }
+
+  const response: CreateInviteResponse = {
+    ticketList,
+  };
+
+  return response;
+}
+
+export { createOrder, updatePaidOrder, checkInTicket, createInvite };
