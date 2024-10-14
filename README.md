@@ -99,6 +99,72 @@ pnpm dev
 }
 ```
 
+## Create invite tickets
+
+> Create tickets without payment, for admin use.
+
+`your_ticketing_domain/api/admin/invite`
+
+- Validate the request with zod
+- Validate if you are an authorized admin
+- Create tickets in the database
+- Send email with the ticket information
+
+### Parameters:
+
+```json
+{
+    "authEvent": <json object, nostr event with your admin key>,
+}
+```
+
+Auth Event:
+
+```json
+{
+  "id": <32-bytes lowercase hex-encoded sha256 of the serialized event data>,
+  "pubkey": <32-bytes lowercase hex-encoded public key of the event creator>,
+  "created_at": <unix timestamp in seconds>,
+  "kind": 27243,
+  "tags": [],
+  "content": <string>,
+  "sig":  <64-bytes lowercase hex of the signature of the sha256 hash of the serialized event data>
+}
+```
+
+Content:
+
+> Stringified json with the action and the list of emails and fullname.
+
+```json
+{
+    "action": <string, "add" or "remove">,
+    "list": <array of arrays, [fullname, email]>
+}
+```
+
+### Response:
+
+#### Valid
+
+```json
+{
+	"status": <boolean>,
+	"data": {
+		"message": <string>
+	}
+}
+```
+
+#### Invalid
+
+```json
+{
+	"status": <boolean>,
+	"errors": <string>
+}
+```
+
 ## Claim ticket
 
 > Ticket is a single ticket for an event, only emmit when the order is paid.
