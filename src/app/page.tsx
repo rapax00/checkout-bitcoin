@@ -113,7 +113,7 @@ export default function Page() {
   );
 
   // Nostr
-  const { events, relay } = useRelay({
+  const { events, relay, clearEvents } = useRelay({
     relayUrl: 'wss://relay.lawallet.ar',
     filters,
     closeOnEose: false,
@@ -264,7 +264,17 @@ export default function Page() {
     setPaymentRequest(undefined);
     setVerifyUrl(undefined);
     setCode('');
-  }, [setEventReferenceId, setTicketQuantity, setPaymentRequest, setCode]);
+    setUserData(undefined);
+    clear();
+    clearEvents();
+  }, [
+    setEventReferenceId,
+    setTicketQuantity,
+    setPaymentRequest,
+    setCode,
+    clear,
+    clearEvents,
+  ]);
 
   // Update ticket price calculations
   useEffect(() => {
