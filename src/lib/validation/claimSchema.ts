@@ -1,5 +1,6 @@
 import { Event, validateEvent, verifyEvent } from 'nostr-tools';
 import { z } from 'zod';
+// import { claimEventSchema } from './nostrEventSchema';
 
 const tagSchema = z.tuple([z.string(), z.string()]);
 
@@ -49,6 +50,8 @@ export const orderClaimSchema = z.object({
     id: z.string().length(64, { message: 'Invalid ID' }),
     sig: z.string().length(128, { message: 'Invalid signature' }),
   }),
+  code: z.string().optional(),
+  // claimEvent: claimEventSchema,
 });
 
 export function validateZapReceiptEmitter(zapEvent: Event): boolean {
@@ -85,3 +88,26 @@ export function validateZapRequest(
 
   return true;
 }
+
+// export function validateClaimEvent(
+//   claimEvent: Event,
+//   adminPublicKey: string
+// ): boolean {
+//   const isValidEvent = validateEvent(claimEvent);
+
+//   if (!isValidEvent) {
+//     return false;
+//   }
+
+//   const isVerifyEvent = verifyEvent(claimEvent);
+
+//   if (!isVerifyEvent) {
+//     return false;
+//   }
+
+//   if (claimEvent.pubkey !== adminPublicKey) {
+//     return false;
+//   }
+
+//   return true;
+// }

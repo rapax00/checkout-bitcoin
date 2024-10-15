@@ -22,7 +22,7 @@ const useOrder = (): UseOrderReturn => {
 
   const requestNewOrder = useCallback(
     async (data: OrderRequestData): Promise<OrderRequestReturn> => {
-      console.log('requestNewOrder', data);
+      console.log('requestNewOrder params', data);
       try {
         const response = await fetch('/api/ticket/request', {
           method: 'POST',
@@ -42,7 +42,7 @@ const useOrder = (): UseOrderReturn => {
         setIsPaid(false);
 
         return new Promise((resolve) => {
-          console.log('requestNewOrder', result.data);
+          console.log('requestNewOrder response', result.data);
           resolve({ ...result.data });
         });
       } catch (error: any) {
