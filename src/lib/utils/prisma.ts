@@ -67,7 +67,8 @@ async function createOrder(
 async function updatePaidOrder(
   fullname: string,
   email: string,
-  zapReceipt: Event
+  zapReceipt: Event,
+  code: string | null
 ): Promise<UpdatePaidOrderResponse> {
   const eventReferenceId = zapReceipt.tags.find((tag) => tag[0] === 'e')![1];
 
@@ -97,6 +98,17 @@ async function updatePaidOrder(
         where: { email },
         data: { fullname },
       });
+
+      if (code) {
+        await prisma.code.update({
+          where: { code },
+          data: {
+            used: {
+              increment: 1,
+            },
+          },
+        });
+      }
 
       if (!order || !user) {
         throw new Error('Order or user not found, cannot create ticket');

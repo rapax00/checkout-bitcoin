@@ -50,3 +50,11 @@ model Ticket {
     User  User   @relation(fields: [userId], references: [id])
     Order Order? @relation(fields: [orderId], references: [id])
 }
+
+model Code {
+    id       String  @id @default(uuid())
+    code     String  @unique
+    comment  String?
+    discount Int
+    used     Int     @default(0)
+}

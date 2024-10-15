@@ -1,4 +1,5 @@
-import { getCodeDiscount } from '@/lib/utils/codes';
+import { getCodeDiscountFront } from '@/lib/utils/codes';
+import { Event, EventTemplate, finalizeEvent } from 'nostr-tools';
 import { useEffect, useState } from 'react';
 
 interface UseCodeReturn {
@@ -27,7 +28,7 @@ const useCode = (): UseCodeReturn => {
     setIsLoading(true);
 
     const timeoutId = setTimeout(() => {
-      const discount = getCodeDiscount(codeFix);
+      const discount = getCodeDiscountFront(codeFix);
 
       setDiscountMultiple(discount);
       setIsLoading(false);

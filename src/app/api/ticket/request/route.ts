@@ -8,13 +8,14 @@ import { ses } from '@/services/ses';
 import { AppError } from '@/lib/errors/appError';
 import { sendy } from '@/services/sendy';
 import { calculateTicketPrice } from '@/lib/utils/price';
-import { getCodeDiscount } from '@/lib/utils/codes';
+import { getCodeDiscountBack } from '@/lib/utils/codes';
 import { generateRelay } from '@/lib/utils/relay';
 
 interface RequestTicketResponse {
   pr: string;
   verify: string;
   eventReferenceId: string;
+  code: string | null;
 }
 
 export async function POST(req: NextRequest) {
@@ -37,7 +38,7 @@ export async function POST(req: NextRequest) {
     // Prisma Create order and user (if not created before) in prisma
     let orderResponse: CreateOrderResponse;
     // Calculate ticket price
-    const discountMultiple = code ? getCodeDiscount(code) : 1;
+    const discountMultiple = code ? await getCodeDiscountBack(code) : 1;
     const ticketPriceArs = parseInt(
       (parseInt(process.env.NEXT_TICKET_PRICE_ARS!) * discountMultiple).toFixed(
         0
@@ -125,6 +126,7 @@ export async function POST(req: NextRequest) {
       pr: pr,
       verify,
       eventReferenceId: orderResponse.eventReferenceId,
+      code: code || null,
     };
 
     // // New logic to connect to relay and listen for payment events

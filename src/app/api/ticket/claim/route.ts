@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
       throw new AppError(result.error.errors[0].message, 400);
     }
 
-    const { fullname, email, zapReceipt } = result.data;
+    const { fullname, email, zapReceipt, code } = result.data;
 
     // Validate zapReceipt
     const isValidEvent = validateEvent(zapReceipt);
@@ -53,7 +53,12 @@ export async function POST(req: NextRequest) {
     // Prisma
     let updateOrderResponse: UpdatePaidOrderResponse;
     try {
-      updateOrderResponse = await updatePaidOrder(fullname, email, zapReceipt);
+      updateOrderResponse = await updatePaidOrder(
+        fullname,
+        email,
+        zapReceipt,
+        code || null
+      );
     } catch (error: any) {
       throw new AppError('Failed to update order', 500);
     }
