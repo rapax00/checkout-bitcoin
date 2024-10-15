@@ -146,7 +146,7 @@ export default function Page() {
           behavior: 'auto',
         });
 
-        setUserData(data);
+        setUserData({ ...data, code });
       } catch (error: any) {
         setOpenAlert(true);
         setAlertText(error.message);

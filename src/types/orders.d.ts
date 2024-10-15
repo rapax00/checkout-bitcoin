@@ -2,11 +2,11 @@ export interface OrderUserData {
   fullname: string;
   email: string;
   newsletter?: boolean;
+  code?: string;
 }
 
 export interface OrderRequestData extends OrderUserData {
   ticketQuantity: number;
-  code?: string;
 }
 
 export interface OrderRequestReturn {

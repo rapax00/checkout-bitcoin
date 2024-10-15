@@ -22,6 +22,7 @@ const useOrder = (): UseOrderReturn => {
 
   const requestNewOrder = useCallback(
     async (data: OrderRequestData): Promise<OrderRequestReturn> => {
+      console.log('requestNewOrder', data);
       try {
         const response = await fetch('/api/ticket/request', {
           method: 'POST',
@@ -64,6 +65,7 @@ const useOrder = (): UseOrderReturn => {
         fullname: data.fullname,
         email: data.email,
         zapReceipt: zapReceiptEvent,
+        code: data.code,
       };
 
       const response = await fetch(`/api/ticket/claim`, {
