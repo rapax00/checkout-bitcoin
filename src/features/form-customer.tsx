@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +7,8 @@ import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { OrderUserData } from '@/types/orders';
 import { CircleCheck, CircleDashed, CircleX } from 'lucide-react';
+
+const MAX_TICKETS = parseInt(process.env.NEXT_MAX_TICKETS || '0', 10); // Get the max tickets from env
 
 interface FormCustomerProps {
   onSubmit: (data: OrderUserData) => void;
@@ -26,13 +28,47 @@ export function FormCustomer({
   const [email, setEmail] = useState<string>('');
   const [newsletter, setNewsletter] = useState<boolean>(true);
   const [message, setMessage] = useState('');
-
   const [loading, setLoading] = useState<boolean>(false);
   const [codeStatus, setCodeStatus] = useState<string>(''); // 'valid', 'invalid', or 'loading'
+  const [maxTicketsReached, setMaxTicketsReached] = useState<boolean>(false);
+
+  // Check total tickets in the database on component mount
+  useEffect(() => {
+    const checkTickets = async () => {
+      try {
+        const response = await fetch('/api/ticket/count', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(`${errorData.errors || response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        if (response.ok) {
+          if (data.data.totalTickets >= MAX_TICKETS) {
+            setMaxTicketsReached(true);
+          }
+        } else {
+          console.error('Failed to fetch total tickets:', data.error);
+        }
+
+        console.log('setMaxTicketsReached', maxTicketsReached);
+      } catch (error) {
+        console.error('Error fetching total tickets:', error);
+      }
+    };
+
+    checkTickets();
+  }, []);
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
-
     setLoading(true);
 
     // Insert data if not exist
@@ -147,9 +183,14 @@ export function FormCustomer({
                   </div>
                 </div>
               </div>
-              <Button type="submit" disabled={loading}>
+              <Button type="submit" disabled={loading || maxTicketsReached}>
                 {loading ? 'Generando ticket' : 'Confirm order'}
               </Button>
+              {maxTicketsReached && (
+                <p className="text-red-500 text-sm">
+                  Maximum number of tickets reached.
+                </p>
+              )}
             </form>
             {message && <p className="text-center text-sm mt-2">{message}</p>}
           </div>

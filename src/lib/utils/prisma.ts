@@ -273,4 +273,17 @@ async function createInvite(
   return response;
 }
 
-export { createOrder, updatePaidOrder, checkInTicket, createInvite };
+// Function to count total tickets in the database
+async function countTotalTickets(): Promise<number> {
+  const count = await prisma.ticket.count();
+  console.log('prisma countTotalTickets', count);
+  return count;
+}
+
+export {
+  createOrder,
+  updatePaidOrder,
+  checkInTicket,
+  createInvite,
+  countTotalTickets,
+};
