@@ -61,7 +61,7 @@ import { useRelay } from '@/hooks/useRelay';
 const TICKET = {
   title: 'Bitcoin Night Rooftop Edition',
   subtitle: 'Bitcoin + Bitcoiners + Comida',
-  description: ['22 de Octubre', 'Van Konin Sucre', 'A las 20:00 hs'],
+  description: ['22 de Octubre', 'Van Koning Sucre 4399, Buenos Aires', 'A las 20:00 hs'],
   imageUrl: 'https://placehold.co/400',
   value: parseInt(process.env.NEXT_TICKET_PRICE_ARS!),
   valueType: 'SAT',
