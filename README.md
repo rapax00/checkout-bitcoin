@@ -2,7 +2,7 @@
 
 This is a simple ticket checkout system to pay with SATS.
 
-It use Lightning Network to pay tickets, NOSTR to comunication, Sendy to mailing
+It use Lightning Network to pay tickets, NOSTR to comunication, Sendy to mailing 
 service and SQLite to database.
 
 # Table of Contents
