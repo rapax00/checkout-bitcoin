@@ -9,8 +9,8 @@ const nextConfig = {
     NEXT_SENDY_LIST_ID: process.env.SENDY_LIST_ID,
     NEXT_AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
     NEXT_AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
-    NEXT_PUBLIC_API_URL: process.env.PUBLIC_API_URL,
     NEXT_DISCOUNT_CODES: process.env.DISCOUNT_CODES,
+    NEXT_MAX_TICKETS: process.env.MAX_TICKETS,
   },
   images: {
     remotePatterns: [
