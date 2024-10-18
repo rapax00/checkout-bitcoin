@@ -25,7 +25,7 @@ class SESClient implements SESClientInterface {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Tu Entrada para el Cumpleaños de La Crypta</title>
+        <title>Tu Entrada para la Bitcoin Night</title>
         <style>
           body {
             font-family: Arial, sans-serif;
@@ -110,22 +110,15 @@ class SESClient implements SESClientInterface {
       </head>
       <body>
         <div class="container">
-          <div class="logo-container">
-            <img src='https://raw.githubusercontent.com/lacrypta/branding/main/iso/isologo-white.png' alt='la-crypta-logo'>
-          </div>
-          <h1>Tu entrada para el Cumpleaños de La Crypta</h1>
-          <p>Te esperamos en: <br>📍 Villanueva 1367, Belgrano, CABA. <br>⏰ A partir de las 21:00 hs. </p>
+          <h1>Tu entrada para la Bitcoin Night</h1>
+          <p>Te esperamos: <br>🗓️ 22 de Octubre <br>📍 Van Konin. Sucre 4399, C1430 Cdad. Autónoma de Buenos Aires. <br>⏰ A partir de las 20:00 hs. </p>
           <div class="qr-code">
             <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${orderId}" alt="QR Code">
           </div>
           <p style="text-align:center;">Presentá este QR en la entrada.</p>
           <p style="text-align:center; color:gray;">ID: ${orderId}</p>
           <div class="footer">
-            <hr class="divider">
-            <p>Seguinos en nuestras redes:</p>
-            <a href="https://x.com/lacryptaok" target="_blank">X</a> | <a href="https://instagram.com/lacryptaok" target="_blank">Instagram</a> | <a href="https://lacrypta.ar" target="_blank">Web</a> | <a href="https://primal.net/p/npub1rujdpkd8mwezrvpqd2rx2zphfaztqrtsfg6w3vdnljdghs2q8qrqtt9u68" target="_blank">Nostr</a>
-            <hr class="divider">
-            <p>&copy; 2024 La Crypta. Todos los derechos reservados.</p>
+            <p>&copy; 2024 Bitcoin Night. Todos los derechos reservados.</p>
           </div>
         </div>
       </body>
@@ -140,7 +133,7 @@ class SESClient implements SESClientInterface {
       Content: {
         Simple: {
           Subject: {
-            Data: 'Tu entrada para el Cumpleaños de La Crypta',
+            Data: 'Tu entrada para la Bitcoin Night',
           },
           Body: {
             Html: {

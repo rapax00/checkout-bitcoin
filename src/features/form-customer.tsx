@@ -26,7 +26,7 @@ export function FormCustomer({
   // Form
   const [fullname, setFullname] = useState<string>('');
   const [email, setEmail] = useState<string>('');
-  const [newsletter, setNewsletter] = useState<boolean>(true);
+  const [newsletter, setNewsletter] = useState<boolean>(false);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState<boolean>(false);
   const [codeStatus, setCodeStatus] = useState<string>(''); // 'valid', 'invalid', or 'loading'
@@ -98,43 +98,45 @@ export function FormCustomer({
 
   return (
     <>
-      <div className="flex-1 flex flex-col gap-4">
-        <div className="flex flex-col gap-2">
-          <h2 className="font-bold text-2xl">Information</h2>
-          <p className="text-text">
-            Completá la información para recibir tu entrada.
-          </p>
-        </div>
-        <Card className="p-6">
-          <div className="flex flex-col flex-1 justify-start">
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="name">Name</Label>
-                  <Input
-                    type="text"
-                    id="fullname"
-                    name="fullname"
-                    minLength={3}
-                    placeholder="Your alias"
-                    required
-                    onChange={(e) => setFullname(e.target.value)}
-                    defaultValue={fullname}
-                  />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="Your real mail"
-                    required
-                    onChange={(e) => setEmail(e.target.value)}
-                    defaultValue={email}
-                  />
-                </div>
-                <div className="flex flex-col gap-2">
+      {/* <div
+        className={`flex-1 flex flex-col gap-4 ${maxTicketsReached ? 'blur-sm' : ''}`}
+      > */}
+      <div className="flex flex-col gap-2">
+        <h2 className="font-bold text-2xl">Information</h2>
+        <p className="text-text">
+          Completá la información para recibir tu entrada.
+        </p>
+      </div>
+      <Card className="p-6">
+        <div className="flex flex-col flex-1 justify-start">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  type="text"
+                  id="fullname"
+                  name="fullname"
+                  minLength={3}
+                  placeholder="Your alias"
+                  required
+                  onChange={(e) => setFullname(e.target.value)}
+                  defaultValue={fullname}
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  type="email"
+                  id="email"
+                  name="email"
+                  placeholder="Your real mail"
+                  required
+                  onChange={(e) => setEmail(e.target.value)}
+                  defaultValue={email}
+                />
+              </div>
+              {/* <div className="flex flex-col gap-2">
                   <Label htmlFor="code">Code</Label>
                   <div className="relative">
                     <Input
@@ -166,39 +168,44 @@ export function FormCustomer({
                       )}
                     </div>
                   </div>
-                </div>
-                <div className="items-top flex space-x-2 mt-2">
-                  <Checkbox
-                    id="newsletter"
-                    onCheckedChange={() => setNewsletter(!newsletter)}
-                    checked={newsletter}
-                  />
-                  <div className="grid gap-1.5 leading-none">
-                    <label
-                      htmlFor="newsletter"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      Subscribe to the newsletter
-                    </label>
-                    <p className="text-sm text-text">
-                      You agree to our Terms of Service and Privacy Policy.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <Button type="submit" disabled={loading || maxTicketsReached}>
-                {loading ? 'Generando ticket' : 'Confirm order'}
-              </Button>
-              {maxTicketsReached && (
+                </div> */}
+              {/* <div className="items-top flex space-x-2 mt-2">
+                <Checkbox
+                  id="newsletter"
+                  onCheckedChange={() => setNewsletter(!newsletter)}
+                  checked={newsletter}
+                />
+                <div className="grid gap-1.5 leading-none">
+                  <label
+                    htmlFor="newsletter"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Subscribe to the newsletter
+                  </label>
+                  <p className="text-sm text-text">
+                    You agree to our Terms of Service and Privacy Policy.
+                  </p>
+                </div> 
+              </div> */}
+            </div>
+            <Button type="submit" disabled={loading}>
+              {loading ? 'Generando ticket' : 'Confirm order'}
+            </Button>
+            {/* {maxTicketsReached && (
                 <p className="text-red-500 text-sm">
                   Maximum number of tickets reached.
                 </p>
-              )}
-            </form>
-            {message && <p className="text-center text-sm mt-2">{message}</p>}
+              )} */}
+          </form>
+          {message && <p className="text-center text-sm mt-2">{message}</p>}
+        </div>
+      </Card>
+      {/* {maxTicketsReached && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <h2 className="text-white text-2xl">Sold max tickets</h2>
           </div>
-        </Card>
-      </div>
+        )} */}
+      {/* </div> */}
     </>
   );
 }
