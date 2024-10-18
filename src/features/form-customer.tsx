@@ -183,23 +183,13 @@ export function FormCustomer({
                   </div>
                 </div>
               </div>
-              <Button type="submit" disabled={loading || maxTicketsReached}>
+              <Button type="submit" disabled={loading}>
                 {loading ? 'Generando ticket' : 'Confirm order'}
               </Button>
-              {maxTicketsReached && (
-                <p className="text-red-500 text-sm">
-                  Maximum number of tickets reached.
-                </p>
-              )}
             </form>
             {message && <p className="text-center text-sm mt-2">{message}</p>}
           </div>
         </Card>
-        {maxTicketsReached && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <h2 className="text-white text-2xl">Sold max tickets</h2>
-          </div>
-        )}
       </div>
     </>
   );
