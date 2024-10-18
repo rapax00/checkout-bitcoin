@@ -75,6 +75,8 @@ const TICKET = {
   valueType: 'SAT',
 };
 
+const MAX_TICKETS = parseInt(process.env.NEXT_MAX_TICKETS || '0', 10); // Get the max tickets from env
+
 export default function Page() {
   // Flow
   const [screen, setScreen] = useState<string>('information');
@@ -96,6 +98,7 @@ export default function Page() {
     undefined
   );
   const [verifyUrl, setVerifyUrl] = useState<string | undefined>(undefined);
+  const [maxTicketsReached, setMaxTicketsReached] = useState<boolean>(false);
 
   // Hooks
   const { isPaid, requestNewOrder, claimOrderPayment, clear } = useOrder();
@@ -305,6 +308,39 @@ export default function Page() {
     }
   }, [isPaid]);
 
+  // Check total tickets in the database on component mount
+  useEffect(() => {
+    const checkTickets = async () => {
+      try {
+        const response = await fetch('/api/ticket/count', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(`${errorData.errors || response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        if (response.ok) {
+          if (data.data.totalTickets >= MAX_TICKETS) {
+            setMaxTicketsReached(true);
+          }
+        } else {
+          console.error('Failed to fetch total tickets:', data.error);
+        }
+      } catch (error) {
+        console.error('Error fetching total tickets:', error);
+      }
+    };
+
+    checkTickets();
+  }, []);
+
   return (
     <>
       <div className="flex flex-col md:flex-row w-full min-h-[100dvh]">
@@ -334,86 +370,96 @@ export default function Page() {
                     </CardContent>
                   </div>
                 </Card>
-                <Card className="p-4 bg-background mt-4">
-                  <div className="flex justify-between items-center gap-4">
-                    <div>
-                      <p className="font-semibold text-lg">
-                        <>
-                          {discountMultiple !== 1 && (
-                            <span className="line-through mr-2 text-text">
-                              {Math.round(ticketPriceARS / discountMultiple)}
-                            </span>
-                          )}
-                          {ticketPriceARS} ARS
-                        </>
-                        {discountMultiple !== 1 && (
-                          <span className="font-semibold text-sm text-primary">
-                            {' '}
-                            {((1 - discountMultiple) * 100).toFixed(0)}
-                            {'% OFF'}
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                    <div className="flex gap-2 items-center">
-                      <Button
-                        variant={
-                          screen !== 'information' || ticketQuantity === 1
-                            ? 'ghost'
-                            : 'secondary'
-                        }
-                        size="icon"
-                        onClick={() => setTicketQuantity(ticketQuantity - 1)}
-                        disabled={
-                          screen !== 'information' || ticketQuantity === 1
-                        }
-                      >
-                        <MinusIcon />
-                      </Button>
-                      <p className="flex items-center justify-center gap-1 w-[40px] font-semibold">
-                        {screen !== 'information' && (
-                          <span className="font-normal text-xs text-text">
-                            x
-                          </span>
-                        )}
-                        {ticketQuantity}
-                      </p>
-                      <Button
-                        variant={
-                          screen !== 'information' ? 'ghost' : 'secondary'
-                        }
-                        size="icon"
-                        onClick={() => setTicketQuantity(ticketQuantity + 1)}
-                        disabled={screen !== 'information'}
-                      >
-                        <PlusIcon />
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-                <Card className="bg-background">
-                  <div className="p-4">
-                    <div className="flex gap-4 justify-between items-center">
-                      <p className="text-text">Total</p>
-                      <div className="text-right">
-                        <p className="font-bold text-md">
-                          {totalSats ? (
+                {!maxTicketsReached && (
+                  <>
+                    <Card className="p-4 bg-background mt-4">
+                      <div className="flex justify-between items-center gap-4">
+                        <div>
+                          <p className="font-semibold text-lg">
                             <>
                               {discountMultiple !== 1 && (
                                 <span className="line-through mr-2 text-text">
-                                  {Math.round(totalSats / discountMultiple)}
+                                  {Math.round(
+                                    ticketPriceARS / discountMultiple
+                                  )}
                                 </span>
                               )}
-                              {totalSats} {TICKET.valueType}
+                              {ticketPriceARS} ARS
                             </>
-                          ) : (
-                            'Calculating...'
-                          )}
-                        </p>
+                            {discountMultiple !== 1 && (
+                              <span className="font-semibold text-sm text-primary">
+                                {' '}
+                                {((1 - discountMultiple) * 100).toFixed(0)}
+                                {'% OFF'}
+                              </span>
+                            )}
+                          </p>
+                        </div>
+                        <div className="flex gap-2 items-center">
+                          <Button
+                            variant={
+                              screen !== 'information' || ticketQuantity === 1
+                                ? 'ghost'
+                                : 'secondary'
+                            }
+                            size="icon"
+                            onClick={() =>
+                              setTicketQuantity(ticketQuantity - 1)
+                            }
+                            disabled={
+                              screen !== 'information' || ticketQuantity === 1
+                            }
+                          >
+                            <MinusIcon />
+                          </Button>
+                          <p className="flex items-center justify-center gap-1 w-[40px] font-semibold">
+                            {screen !== 'information' && (
+                              <span className="font-normal text-xs text-text">
+                                x
+                              </span>
+                            )}
+                            {ticketQuantity}
+                          </p>
+                          <Button
+                            variant={
+                              screen !== 'information' ? 'ghost' : 'secondary'
+                            }
+                            size="icon"
+                            onClick={() =>
+                              setTicketQuantity(ticketQuantity + 1)
+                            }
+                            disabled={screen !== 'information'}
+                          >
+                            <PlusIcon />
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                </Card>
+                    </Card>
+                    <Card className="bg-background">
+                      <div className="p-4">
+                        <div className="flex gap-4 justify-between items-center">
+                          <p className="text-text">Total</p>
+                          <div className="text-right">
+                            <p className="font-bold text-md">
+                              {totalSats ? (
+                                <>
+                                  {discountMultiple !== 1 && (
+                                    <span className="line-through mr-2 text-text">
+                                      {Math.round(totalSats / discountMultiple)}
+                                    </span>
+                                  )}
+                                  {totalSats} {TICKET.valueType}
+                                </>
+                              ) : (
+                                'Calculating...'
+                              )}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  </>
+                )}
               </>
             ) : (
               <>
