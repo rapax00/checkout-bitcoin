@@ -11,8 +11,8 @@ import { Toaster } from '@/components/ui/toaster';
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
-  title: 'Ticketing - La Crypta',
-  description: 'Ticketing para eventos de La Crypta',
+  title: 'Ticketing - Bitcoin Night',
+  description: 'Ticketing para la Bitcoin Night',
 };
 
 export default function RootLayout({

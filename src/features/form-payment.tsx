@@ -126,11 +126,11 @@ export function FormPayment({ invoice }: FormPaymentProps) {
                       size={300}
                       imageSettings={{
                         // Iso 24x24, image 42x42
-                        src: '/iso.png',
+                        src: '/bitcoin-night.png',
                         x: undefined,
                         y: undefined,
-                        height: 42,
-                        width: 42,
+                        height: 32,
+                        width: 32,
                         excavate: true,
                       }}
                     />

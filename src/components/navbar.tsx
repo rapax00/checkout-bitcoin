@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 
 export function Navbar() {
@@ -5,8 +6,7 @@ export function Navbar() {
     <nav className="absolute top-0 left-0 w-full h-[60px]">
       <div className="flex gap-2 px-4 w-full max-w-[520px] h-full items-center justify-between mx-auto">
         <Link href="/" className="w-auto">
-          <LaCryptaIso className="w-auto h-[30px]" />
-          {/* <img src='https://placehold.co/120x50' alt='' width={120} height={50} /> */}
+          <Image src="/bitcoin-night.png" alt="" width={42} height={42} />
         </Link>
         {/* <div className='h-full flex items-center gap-2 ml-4'>
                 <Select defaultValue='SAT'>
