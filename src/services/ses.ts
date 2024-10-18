@@ -111,7 +111,7 @@ class SESClient implements SESClientInterface {
       <body>
         <div class="container">
           <h1>Tu entrada para la Bitcoin Night</h1>
-          <p>Te esperamos: <br>🗓️ 22 de Octubre <br>📍 Van Konin. Sucre 4399, C1430 Cdad. Autónoma de Buenos Aires. <br>⏰ A partir de las 20:00 hs. </p>
+          <p>Te esperamos: <br>🗓️ 22 de Octubre <br>📍 Van Koning. Sucre 4399, C1430 Cdad. Autónoma de Buenos Aires. <br>⏰ A partir de las 20:00 hs. </p>
           <div class="qr-code">
             <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${orderId}" alt="QR Code">
           </div>
