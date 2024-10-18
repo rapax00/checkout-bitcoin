@@ -60,7 +60,7 @@ import { useRelay } from '@/hooks/useRelay';
 // Mock data
 const TICKET = {
   title: 'Bitcoin Night Rooftop Edition',
-  subtitle: 'Bitcion + Bitcoiners + Comida',
+  subtitle: 'Bitcoin + Bitcoiners + Comida',
   description: ['22 de Octubre', 'Van Konin Sucre', 'A las 20:00 hs'],
   imageUrl: 'https://placehold.co/400',
   value: parseInt(process.env.NEXT_TICKET_PRICE_ARS!),
