@@ -206,6 +206,16 @@ export function FormCustomer({
           </div>
         )} */}
       {/* </div> */}
+      <footer className="absolute bottom-0 left-0 w-full p-4 text-center text-white">
+        Powered by{' '}
+        <a
+          href="https://lacrypta.ar"
+          target="_blank"
+          className="text-primary underline"
+        >
+          La Crypta
+        </a>
+      </footer>
     </>
   );
 }
