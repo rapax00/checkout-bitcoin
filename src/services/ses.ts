@@ -117,7 +117,7 @@ class SESClient implements SESClientInterface {
           </div>
           <h1>Tu entrada para el Halloween de La Crypta</h1>
           <p>Te esperamos en: <br>📍 Villanueva 1367, Belgrano, CABA. <br>⏰ A partir de las 22:00 hs.</p>
-          <p>🚌 <strong>IMPORTANTE:</strong> sumate a nuestro grupo de telegram si querés reservar tu traslado GRATIS desde LaBitConf a la fiesta. <a href="${urlTelegramGroup}" target="_blank">Hacé click acá</a>.</p>
+          <p>🚌 <strong>IMPORTANTE:</strong> sumate a nuestro grupo de telegram si querés reservar tu traslado GRATIS desde LABITCONF a la fiesta. <a href="${urlTelegramGroup}" target="_blank">Hacé click acá</a>.</p>
           <div class="qr-code">
             <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${orderId}" alt="QR Code">
           </div>
