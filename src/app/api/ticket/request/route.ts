@@ -38,7 +38,9 @@ export async function POST(req: NextRequest) {
     // Prisma Create order and user (if not created before) in prisma
     let orderResponse: CreateOrderResponse;
     // Calculate ticket price
-    const discountMultiple = code ? await getCodeDiscountBack(code) : 1;
+    const discountMultiple = code
+      ? await getCodeDiscountBack(code.toLowerCase())
+      : 1;
     const ticketPriceArs = parseInt(
       (parseInt(process.env.NEXT_TICKET_PRICE_ARS!) * discountMultiple).toFixed(
         0
