@@ -353,6 +353,7 @@ export default function Page() {
                           </span>
                         )}
                       </p>
+                      <p className="text-gray-600 text-sm">Segunda tanda</p>
                     </div>
                     <div className="flex gap-2 items-center">
                       <Button
