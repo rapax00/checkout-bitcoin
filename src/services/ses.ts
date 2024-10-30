@@ -1,3 +1,5 @@
+// ses
+
 import {
   SESv2Client,
   SendEmailCommand,
@@ -25,7 +27,7 @@ class SESClient implements SESClientInterface {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Tu Entrada para la Bitcoin Night</title>
+        <title>Tu Entrada para la Bitcoin Night Privada</title>
         <style>
           body {
             font-family: Arial, sans-serif;
@@ -110,8 +112,9 @@ class SESClient implements SESClientInterface {
       </head>
       <body>
         <div class="container">
-          <h1>Tu entrada para la Bitcoin Night</h1>
-          <p>Te esperamos: <br>🗓️ 22 de Octubre <br>📍 Van Koning. Sucre 4399, C1430 Cdad. Autónoma de Buenos Aires. <br>⏰ A partir de las 20:00 hs. </p>
+          <h1>Tu entrada para la Bitcoin Night Privada</h1>
+          <p>Esta vez nos reunimos en una Bitcoin Night Privada y Especial. Haremos el workshop de Fedi conducido por Lore Ortiz y luego asado en la terraza a cargo de nuestro asador estrella Manu Ferrari para celebrar con amigos el post labitconf y el cumple de Andrés.</p>
+          <p>🗓️ 4 de Noviembre <br>📍 Espacio Cultural Bitcoin, M.T. de Alvear 405. <br>⏰ Puntual a las 18:30.</p>
           <div class="qr-code">
             <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${orderId}" alt="QR Code">
           </div>

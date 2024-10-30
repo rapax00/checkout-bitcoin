@@ -1,3 +1,5 @@
+// page
+
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
@@ -59,9 +61,13 @@ import { useRelay } from '@/hooks/useRelay';
 
 // Mock data
 const TICKET = {
-  title: 'Bitcoin Night Rooftop Edition',
-  subtitle: 'Bitcoin + Bitcoiners + Comida',
-  description: ['22 de Octubre', 'Van Koning Sucre 4399, Buenos Aires', 'A las 20:00 hs'],
+  title: 'Bitcoin Night Privada',
+  subtitle: 'Workshop Fedi + Cumple de Andrés',
+  description: [
+    'Lunes 4/11',
+    '18:30hs',
+    'En Espacio Cultural Bitcoin, M.T. de Alvear 405.',
+  ],
   imageUrl: 'https://placehold.co/400',
   value: parseInt(process.env.NEXT_TICKET_PRICE_ARS!),
   valueType: 'SAT',
