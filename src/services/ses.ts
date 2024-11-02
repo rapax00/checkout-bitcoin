@@ -113,7 +113,8 @@ class SESClient implements SESClientInterface {
       <body>
         <div class="container">
           <h1>Tu entrada para la Bitcoin Night Privada</h1>
-          <p>Esta vez nos reunimos en una Bitcoin Night Privada y Especial. Haremos el workshop de Fedi conducido por Lore Ortiz y luego asado en la terraza a cargo de nuestro asador estrella Manu Ferrari para celebrar con amigos el post labitconf y el cumple de Andrés.</p>
+          <p>Esta vez nos reunimos en una Bitcoin Night Privada y Especial. Haremos una dinámica de Fedi Games conducido por Lore y Andrés.<p>
+          <p>Luego con tu reserva accedes al asado en la terraza para celebrar con amigos el post labitconf y el cumple de Andrés.</p>
           <p>🗓️ 4 de Noviembre <br>📍 Espacio Cultural Bitcoin, M.T. de Alvear 405. <br>⏰ Puntual a las 18:30.</p>
           <div class="qr-code">
             <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${orderId}" alt="QR Code">
