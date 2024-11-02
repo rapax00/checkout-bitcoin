@@ -62,7 +62,7 @@ import { useRelay } from '@/hooks/useRelay';
 // Mock data
 const TICKET = {
   title: 'Bitcoin Night Privada',
-  subtitle: 'Workshop Fedi + Cumple de Andrés',
+  subtitle: 'Fedi Games s/cargo + Cumple de Andrés',
   description: [
     'Lunes 4/11',
     '18:30hs',
