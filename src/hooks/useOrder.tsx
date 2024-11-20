@@ -1,4 +1,3 @@
-import { useCallback, useState } from 'react';
 import {
   OrderClaimReturn,
   OrderRequestData,
@@ -6,6 +5,7 @@ import {
   OrderUserData,
 } from '@/types/orders';
 import { Event } from 'nostr-tools';
+import { useCallback, useState } from 'react';
 
 interface UseOrderReturn {
   isPaid: boolean;

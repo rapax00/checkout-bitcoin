@@ -1,5 +1,4 @@
 import { getCodeDiscountFront } from '@/lib/utils/codes';
-import { Event, EventTemplate, finalizeEvent } from 'nostr-tools';
 import { useEffect, useState } from 'react';
 
 interface UseCodeReturn {

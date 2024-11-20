@@ -1,7 +1,7 @@
+import { prisma } from '@/services/prismaClient';
 import { Order, Ticket, User } from '@prisma/client';
 import { randomBytes } from 'crypto';
 import { Event } from 'nostr-tools';
-import { prisma } from '@/services/prismaClient';
 
 export interface CreateOrderResponse {
   eventReferenceId: string;
@@ -280,9 +280,9 @@ async function countTotalTickets(): Promise<number> {
 }
 
 export {
+  checkInTicket,
+  countTotalTickets,
+  createInvite,
   createOrder,
   updatePaidOrder,
-  checkInTicket,
-  createInvite,
-  countTotalTickets,
 };

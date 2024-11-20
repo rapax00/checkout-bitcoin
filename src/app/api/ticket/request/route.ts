@@ -1,15 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { Event, Relay } from 'nostr-tools';
+import { AppError } from '@/lib/errors/appError';
+import { getCodeDiscountBack } from '@/lib/utils/codes';
 import { generateZapRequest } from '@/lib/utils/nostr';
-import { generateInvoice, getLnurlpFromWalias } from '@/services/ln';
+import { calculateTicketPrice } from '@/lib/utils/price';
 import { createOrder, CreateOrderResponse } from '@/lib/utils/prisma';
 import { requestOrderSchema } from '@/lib/validation/requestOrderSchema';
-import { ses } from '@/services/ses';
-import { AppError } from '@/lib/errors/appError';
+import { generateInvoice, getLnurlpFromWalias } from '@/services/ln';
 import { sendy } from '@/services/sendy';
-import { calculateTicketPrice } from '@/lib/utils/price';
-import { getCodeDiscountBack } from '@/lib/utils/codes';
-import { generateRelay } from '@/lib/utils/relay';
+import { ses } from '@/services/ses';
+import { NextRequest, NextResponse } from 'next/server';
+import { Event } from 'nostr-tools';
 
 interface RequestTicketResponse {
   pr: string;

@@ -1,6 +1,17 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import QrScanner from '@/components/scanner/Scanner';
+import { createColumns, TicketInfo } from '@/components/table/columns';
+import { DataTable } from '@/components/table/data-table';
+import {
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -9,23 +20,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import {
-  QrCode,
-  RefreshCcw,
-  Blocks,
-  QrCodeIcon,
-  Ban,
-  CircleCheck,
-} from 'lucide-react';
-import * as React from 'react';
-import { DataTable } from '@/components/table/data-table';
-import { createColumns, TicketInfo } from '@/components/table/columns';
-import { EventTemplate, finalizeEvent, Event, getPublicKey } from 'nostr-tools';
-import { toast } from '@/hooks/use-toast';
-import NimiqQrScanner from 'qr-scanner';
-import QrScanner from '@/components/scanner/Scanner';
 import {
   Dialog,
   DialogContent,
@@ -33,18 +27,21 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { toast } from '@/hooks/use-toast';
 import { AlertDialog } from '@radix-ui/react-alert-dialog';
-import { Alert } from '@/components/ui/alert';
 import {
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
+  Ban,
+  Blocks,
+  CircleCheck,
+  QrCode,
+  QrCodeIcon,
+  RefreshCcw,
+} from 'lucide-react';
+import { Event, EventTemplate, finalizeEvent, getPublicKey } from 'nostr-tools';
+import NimiqQrScanner from 'qr-scanner';
+import * as React from 'react';
+import { useCallback, useState } from 'react';
 
 export default function AdminPage() {
   // Authentication

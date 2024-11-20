@@ -1,29 +1,18 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
-import { useZap } from '@lawallet/react';
 import { Event } from 'nostr-tools';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardTitle,
-} from '@/components/ui/card';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
 import { Navbar } from '@/components/navbar';
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -32,29 +21,33 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardTitle } from '@/components/ui/card';
 
 import { cn } from '@/lib/utils';
 
 // Generic
+import { OrderUserData } from '@/types/orders';
 import { FormCustomer } from '../features/form-customer';
 import { FormPayment } from '../features/form-payment';
-import { OrderRequestReturn, OrderUserData } from '@/types/orders';
 
 // Icons
-import { SleepingIcon } from '@/components/icons/SleepingIcon';
 import { CreditCardValidationIcon } from '@/components/icons/CreditCardValidationIcon';
-import { PlusIcon } from '@/components/icons/PlusIcon';
 import { MinusIcon } from '@/components/icons/MinusIcon';
+import { PlusIcon } from '@/components/icons/PlusIcon';
+import { SleepingIcon } from '@/components/icons/SleepingIcon';
 
+import useCode from '@/hooks/useCode';
 import useOrder from '@/hooks/useOrder';
+import { useNostr, useSubscription } from '@lawallet/react';
 import { convertEvent } from '../lib/utils/nostr';
 import { calculateTicketPrice } from '../lib/utils/price';
-import useCode from '@/hooks/useCode';
 import { useRelay } from '@/hooks/useRelay';
 
 // Mock data
@@ -116,11 +109,17 @@ export default function Page() {
   );
 
   // Nostr
-  const { events, relay, clearEvents } = useRelay({
-    relayUrl: 'wss://relay.lawallet.ar',
+  const { validateRelaysStatus } = useNostr();
+  const { events } = useSubscription({
     filters,
-    closeOnEose: false,
+    options: { closeOnEose: false },
+    enabled: Boolean(eventReferenceId),
   });
+  // const { events, relay, clearEvents } = useRelay({
+  //   relayUrl: 'wss://relay.lawallet.ar',
+  //   filters,
+  //   closeOnEose: false,
+  // });
 
   // Reques order (UI button "Confir Order")
   const handleCreateOrder = useCallback(
@@ -140,6 +139,7 @@ export default function Page() {
           code,
         });
 
+        // validateRelaysStatus();
         setPaymentRequest(pr);
         setEventReferenceId(eventReferenceId);
         setVerifyUrl(verify);
@@ -197,7 +197,7 @@ export default function Page() {
 
   useEffect(() => {
     events && events.length && userData && processPayment(events[0], userData);
-  }, [events, userData]);
+  }, [events, userData, processPayment]);
 
   // Process payment via LUD-21 (using with useSubscription hook form lawallet/rect)
   // const verifyPayment = useCallback(async () => {
@@ -269,14 +269,15 @@ export default function Page() {
     setCode('');
     setUserData(undefined);
     clear();
-    clearEvents();
+    validateRelaysStatus();
+    // clearEvents();
   }, [
     setEventReferenceId,
     setTicketQuantity,
     setPaymentRequest,
     setCode,
     clear,
-    clearEvents,
+    validateRelaysStatus,
   ]);
 
   // Update ticket price calculations
@@ -340,6 +341,20 @@ export default function Page() {
 
     checkTickets();
   }, []);
+
+  useEffect(() => {
+    const verifyRelaysConnection = (): void => {
+      if (document.visibilityState === 'visible') {
+        validateRelaysStatus();
+      }
+    };
+
+    document.addEventListener('visibilitychange', verifyRelaysConnection);
+
+    return () => {
+      document.removeEventListener('visibilitychange', verifyRelaysConnection);
+    };
+  }, [validateRelaysStatus]);
 
   return (
     <>

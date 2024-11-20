@@ -1,13 +1,12 @@
-import { getPublicKey } from 'nostr-tools';
 import { AppError } from '@/lib/errors/appError';
+import { createInvite } from '@/lib/utils/prisma';
 import {
   inviteEventSchema,
   validateTicketEvent,
 } from '@/lib/validation/nostrEventSchema';
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/services/prismaClient';
-import { createInvite } from '@/lib/utils/prisma';
 import { ses } from '@/services/ses';
+import { NextRequest, NextResponse } from 'next/server';
+import { getPublicKey } from 'nostr-tools';
 
 export async function POST(req: NextRequest) {
   try {
